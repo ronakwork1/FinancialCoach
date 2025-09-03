@@ -1,46 +1,80 @@
-# Getting Started with Create React App
+# Smart Financial Coach
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern web application that helps users improve their money habits with AI-style insights. The app features a professional, trustworthy design with a blue/green theme and prioritizes accessibility.
 
-## Available Scripts
+## Key Features
 
-In the project directory, you can run:
+- **Privacy-First**: All financial data stays on your device
+- **Interactive Dashboard**: Visualize your financial health with charts and metrics
+- **AI Insights**: Get personalized recommendations based on your spending patterns
+- **Budget Tracking**: Monitor your expenses against your budget
+- **Financial Health Score**: Track your overall financial well-being
+- **Responsive Design**: Works on desktop and mobile devices
+- **Accessible**: Built with accessibility in mind
 
-### `npm start`
+## Technology Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- React with TypeScript
+- Material UI for components
+- Chart.js for data visualization
+- Fully responsive design
+- Accessibility compliant
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v14 or higher)
+- npm or yarn
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository:
+   ```
+   git clone <repository-url>
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Navigate to the project directory:
+   ```
+   cd smart-financial-coach
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Install dependencies:
+   ```
+   npm install
+   ```
 
-### `npm run eject`
+4. Start the development server:
+   ```
+   npm start
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+5. Open your browser and navigate to:
+   ```
+   http://localhost:3000
+   ```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Usage
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. **Dashboard**: View your financial summary, spending trends, and AI insights
+2. **Enter Data**: Input your income, expenses, and savings information
+3. **Get Insights**: Receive personalized recommendations based on your financial data
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Privacy
 
-## Learn More
+This application is designed with privacy in mind. All your financial data is processed locally and never leaves your device. There are no external API calls that send your financial information to any servers.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Accessibility
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The application is built following WCAG guidelines to ensure it's accessible to all users:
+
+- Proper heading structure
+- ARIA labels where needed
+- Sufficient color contrast
+- Keyboard navigation support
+- Screen reader friendly
+- Focus management
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

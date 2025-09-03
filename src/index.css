@@ -11,3 +11,71 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Accessibility enhancements */
+:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+/* Increase contrast for better readability */
+.MuiTypography-root {
+  color: #333333;
+}
+
+.MuiTypography-colorTextSecondary {
+  color: #555555 !important;
+}
+
+/* Ensure sufficient touch target size for mobile */
+button, 
+.MuiButtonBase-root {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Improve form field accessibility */
+.MuiFormLabel-root {
+  font-weight: 500;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #1976d2;
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High contrast focus styles for keyboard navigation */
+.MuiButtonBase-root:focus-visible {
+  outline: 3px solid #1976d2;
+  outline-offset: 2px;
+}
+
+/* Ensure text is readable at different zoom levels */
+html {
+  font-size: 100%;
+}
+
+@media screen and (max-width: 600px) {
+  .MuiTypography-h4 {
+    font-size: 1.75rem;
+  }
+  
+  .MuiTypography-h5 {
+    font-size: 1.5rem;
+  }
+  
+  .MuiTypography-h6 {
+    font-size: 1.25rem;
+  }
+}
