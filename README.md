@@ -2,6 +2,10 @@
 
 A comprehensive personal finance management application that empowers users to take control of their financial health through intelligent insights, detailed analytics, and privacy-first design.
 
+## 🎥 Demo
+
+Watch our presentation demo to see the app in action: [Smart Financial Coach Demo](https://youtu.be/0vRUzcJof98)
+
 ## ✨ What This App Does
 
 Smart Financial Coach is your personal financial companion that transforms raw financial data into actionable insights. Whether you're a freelancer managing variable income, a professional tracking expenses, or a student learning financial literacy, our app provides:
