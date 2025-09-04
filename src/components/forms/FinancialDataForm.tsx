@@ -17,11 +17,15 @@ import {
   Select,
   SelectChangeEvent,
   Alert,
-  Snackbar
+  Snackbar,
+  Divider
 } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import SaveIcon from '@mui/icons-material/Save';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useFinancial } from '../../context/FinancialContext';
+import { exportToCSV } from '../../utils/csvExport';
+import SampleDataLoader from './SampleDataLoader';
 
 // Form validation types
 interface FormErrors {
@@ -217,6 +221,80 @@ const FinancialDataForm: React.FC = () => {
   // Handle snackbar close
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
+  };
+
+  // Handle export to CSV
+  const handleExportToCSV = () => {
+    // Create data in the required format (Date, Merchant, Category, Amount)
+    const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Create sample data based on the user's inputs
+    const csvData = [
+      // Income entries
+      {
+        date: currentDate,
+        merchant: 'Salary',
+        category: 'Income',
+        amount: incomeData.salary || '0'
+      },
+      // Add additional income if present
+      ...(incomeData.additionalIncome ? [{
+        date: currentDate,
+        merchant: 'Additional Income',
+        category: 'Income',
+        amount: incomeData.additionalIncome
+      }] : []),
+      // Expense entries
+      ...(expenseData.housing ? [{
+        date: currentDate,
+        merchant: 'Housing Payment',
+        category: 'Housing',
+        amount: expenseData.housing
+      }] : []),
+      ...(expenseData.utilities ? [{
+        date: currentDate,
+        merchant: 'Utilities Provider',
+        category: 'Utilities',
+        amount: expenseData.utilities
+      }] : []),
+      ...(expenseData.groceries ? [{
+        date: currentDate,
+        merchant: 'Grocery Store',
+        category: 'Groceries',
+        amount: expenseData.groceries
+      }] : []),
+      ...(expenseData.transportation ? [{
+        date: currentDate,
+        merchant: 'Transportation',
+        category: 'Transport',
+        amount: expenseData.transportation
+      }] : []),
+      ...(expenseData.healthcare ? [{
+        date: currentDate,
+        merchant: 'Healthcare Provider',
+        category: 'Healthcare',
+        amount: expenseData.healthcare
+      }] : []),
+      ...(expenseData.entertainment ? [{
+        date: currentDate,
+        merchant: 'Entertainment',
+        category: 'Entertainment',
+        amount: expenseData.entertainment
+      }] : []),
+      ...(expenseData.other ? [{
+        date: currentDate,
+        merchant: 'Other Expenses',
+        category: 'Shopping',
+        amount: expenseData.other
+      }] : [])
+    ];
+    
+    // Export to CSV
+    exportToCSV(csvData, 'my_financial_data.csv');
+    
+    // Show success message
+    setSnackbarMessage('Your financial data has been exported successfully!');
+    setSnackbarOpen(true);
   };
   
   // Form steps
@@ -512,16 +590,30 @@ const FinancialDataForm: React.FC = () => {
           <Alert severity="success" sx={{ mb: 2 }}>
             Your financial data has been saved successfully!
           </Alert>
-          <Button 
-            variant="outlined" 
-            color="primary"
-            onClick={() => {
-              setFormSubmitted(false);
-              setActiveStep(0);
-            }}
-          >
-            Edit Data
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <Button 
+              variant="outlined" 
+              color="primary"
+              onClick={() => {
+                setFormSubmitted(false);
+                setActiveStep(0);
+              }}
+            >
+              Edit Data
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<FileDownloadIcon />}
+              onClick={handleExportToCSV}
+            >
+              Export to CSV
+            </Button>
+            <SampleDataLoader onDataLoaded={() => {
+              setSnackbarMessage('Sample data loaded successfully!');
+              setSnackbarOpen(true);
+            }} />
+          </Box>
         </Box>
       ) : (
         <>
@@ -547,14 +639,24 @@ const FinancialDataForm: React.FC = () => {
               )}
               
               {activeStep === steps.length - 1 ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  startIcon={<SaveIcon />}
-                >
-                  Save Data
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    startIcon={<SaveIcon />}
+                  >
+                    Save Data
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<FileDownloadIcon />}
+                    onClick={handleExportToCSV}
+                  >
+                    Export to CSV
+                  </Button>
+                </Box>
               ) : (
                 <Button
                   variant="contained"

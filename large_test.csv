@@ -1,0 +1,68 @@
+date,merchant,category,amount
+2024-01-01,Starbucks,Coffee,-4.50
+2024-01-02,Starbucks,Coffee,-4.75
+2024-01-03,Starbucks,Coffee,-4.25
+2024-01-04,Starbucks,Coffee,-4.90
+2024-01-05,Starbucks,Coffee,-45.00
+2024-01-06,Grocery Store,Groceries,-65.32
+2024-01-07,Grocery Store,Groceries,-67.89
+2024-01-08,Grocery Store,Groceries,-63.45
+2024-01-09,Grocery Store,Groceries,-68.90
+2024-01-10,Grocery Store,Groceries,-125.00
+2024-01-11,Netflix,Entertainment,-15.99
+2024-01-12,Netflix,Entertainment,-15.99
+2024-01-13,Netflix,Entertainment,-15.99
+2024-01-14,Salary Deposit,Income,3500.00
+2024-01-15,Amazon,Shopping,-29.99
+2024-01-16,Uber,Transportation,-12.50
+2024-01-17,New Coffee Shop,Coffee,-6.50
+2024-01-18,Unknown Merchant,Shopping,-75.00
+2024-01-19,Restaurant A,Dining,-45.67
+2024-01-20,Restaurant B,Dining,-38.90
+2024-01-21,Restaurant C,Dining,-52.34
+2024-01-22,Restaurant D,Dining,-41.23
+2024-01-23,Restaurant E,Dining,-67.89
+2024-01-24,Pharmacy,Healthcare,-23.45
+2024-01-25,Gym,Membership,-49.99
+2024-01-26,Electric Bill,Utilities,-89.34
+2024-01-27,Water Bill,Utilities,-34.56
+2024-01-28,Internet Bill,Utilities,-59.99
+2024-01-29,Phone Bill,Utilities,-45.67
+2024-02-01,Starbucks,Coffee,-4.50
+2024-02-02,Starbucks,Coffee,-4.75
+2024-02-03,Starbucks,Coffee,-4.25
+2024-02-04,Starbucks,Coffee,-4.90
+2024-02-05,Starbucks,Coffee,-35.00
+2024-02-06,Grocery Store,Groceries,-65.32
+2024-02-07,Grocery Store,Groceries,-67.89
+2024-02-08,Grocery Store,Groceries,-63.45
+2024-02-09,Grocery Store,Groceries,-68.90
+2024-02-10,Grocery Store,Groceries,-95.00
+2024-02-11,Netflix,Entertainment,-15.99
+2024-02-12,Netflix,Entertainment,-15.99
+2024-02-13,Netflix,Entertainment,-15.99
+2024-02-14,Bonus Deposit,Income,1500.00
+2024-02-15,Target,Shopping,-67.89
+2024-02-16,Lyft,Transportation,-18.75
+2024-02-17,Cafe Nouveau,Coffee,-7.50
+2024-02-18,Online Store,Shopping,-123.45
+2024-02-19,Pizza Place,Dining,-28.90
+2024-02-20,Burger Joint,Dining,-16.50
+2024-02-21,Sushi Bar,Dining,-42.75
+2024-02-22,Italian Restaurant,Dining,-55.20
+2024-02-23,Mexican Grill,Dining,-31.45
+2024-02-24,Drug Store,Healthcare,-12.34
+2024-02-25,Yoga Studio,Membership,-35.00
+2024-02-26,Electric Bill,Utilities,-91.23
+2024-02-27,Water Bill,Utilities,-36.78
+2024-02-28,Internet Bill,Utilities,-59.99
+2024-03-01,Starbucks,Coffee,-4.50
+2024-03-02,Starbucks,Coffee,-4.75
+2024-03-03,Starbucks,Coffee,-4.25
+2024-03-04,Starbucks,Coffee,-4.90
+2024-03-05,Starbucks,Coffee,-55.00
+2024-03-06,Grocery Store,Groceries,-75.32
+2024-03-07,Grocery Store,Groceries,-72.89
+2024-03-08,Grocery Store,Groceries,-68.45
+2024-03-09,Grocery Store,Groceries,-73.90
+2024-03-10,Grocery Store,Groceries,-145.00

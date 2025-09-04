@@ -1,0 +1,185 @@
+Date,Merchant,Category,Amount
+2024-07-01,Freelance Payment,Income,2800.00
+2024-07-02,Uber,Transport,24.50
+2024-07-03,Coffee Shop,Dining,12.75
+2024-07-04,Adobe Creative Cloud,Subscriptions,52.99
+2024-07-05,Uber,Transport,18.75
+2024-07-06,Office Supply Store,Shopping,89.45
+2024-07-07,Uber,Transport,22.25
+2024-07-08,Whole Foods,Groceries,125.30
+2024-07-09,Apple App Store,Subscriptions,9.99
+2024-07-10,Uber,Transport,19.50
+2024-07-11,Gas Station,Transport,45.50
+2024-07-12,Uber,Transport,26.75
+2024-07-13,Internet Provider,Subscriptions,75.00
+2024-07-14,Amazon Electronics,Shopping,249.99
+2024-07-15,Rent Payment,Housing,950.00
+2024-07-16,Uber,Transport,21.50
+2024-07-17,Health Insurance,Healthcare,325.00
+2024-07-18,Mobile Provider,Subscriptions,85.00
+2024-07-19,Tech Conference,Education,125.00
+2024-07-20,Uber,Transport,23.75
+2024-07-21,Restaurant,Dining,42.75
+2024-07-22,Uber,Transport,17.99
+2024-07-23,Whole Foods,Groceries,132.50
+2024-07-24,Uber,Transport,25.25
+2024-07-25,Co-working Space,Housing,150.00
+2024-07-26,Best Buy,Shopping,179.99
+2024-07-27,Computer Repair,Shopping,350.00
+2024-07-28,Apple App Store,Subscriptions,9.99
+2024-07-29,Uber,Transport,20.50
+2024-07-30,Ride Share,Transport,48.25
+2024-07-31,Uber,Transport,22.75
+2024-08-01,Freelance Payment,Income,3200.00
+2024-08-02,Online Course,Education,199.99
+2024-08-03,Uber,Transport,19.25
+2024-08-04,Coffee Shop,Dining,15.50
+2024-08-05,Adobe Creative Cloud,Subscriptions,52.99
+2024-08-06,Uber,Transport,24.99
+2024-08-07,Office Supply Store,Shopping,67.75
+2024-08-08,Uber,Transport,21.25
+2024-08-09,Whole Foods,Groceries,118.45
+2024-08-10,Apple App Store,Subscriptions,9.99
+2024-08-11,Uber,Transport,18.50
+2024-08-12,Gas Station,Transport,42.75
+2024-08-13,Uber,Transport,23.99
+2024-08-14,Internet Provider,Subscriptions,75.00
+2024-08-15,Amazon Electronics,Shopping,329.99
+2024-08-16,Rent Payment,Housing,950.00
+2024-08-17,Uber,Transport,19.75
+2024-08-18,Health Insurance,Healthcare,325.00
+2024-08-19,Mobile Provider,Subscriptions,85.00
+2024-08-20,Tech Workshop,Education,95.00
+2024-08-21,Uber,Transport,25.50
+2024-08-22,Restaurant,Dining,38.25
+2024-08-23,Uber,Transport,20.99
+2024-08-24,Whole Foods,Groceries,145.75
+2024-08-25,Uber,Transport,22.25
+2024-08-26,Co-working Space,Housing,150.00
+2024-08-27,Microsoft Store,Shopping,149.99
+2024-08-28,Software License,Shopping,299.99
+2024-08-29,Apple App Store,Subscriptions,9.99
+2024-08-30,Uber,Transport,24.75
+2024-08-31,Ride Share,Transport,52.25
+2024-09-01,Freelance Payment,Income,2900.00
+2024-09-02,Uber,Transport,21.50
+2024-09-03,Coffee Shop,Dining,13.25
+2024-09-04,Adobe Creative Cloud,Subscriptions,52.99
+2024-09-05,Uber,Transport,19.99
+2024-09-06,Office Supply Store,Shopping,74.45
+2024-09-07,Uber,Transport,26.75
+2024-09-08,Whole Foods,Groceries,138.90
+2024-09-09,Apple App Store,Subscriptions,9.99
+2024-09-10,Uber,Transport,23.25
+2024-09-11,Gas Station,Transport,48.50
+2024-09-12,Uber,Transport,20.75
+2024-09-13,Internet Provider,Subscriptions,75.00
+2024-09-14,Amazon Electronics,Shopping,199.99
+2024-09-15,Rent Payment,Housing,950.00
+2024-09-16,Uber,Transport,22.99
+2024-09-17,Health Insurance,Healthcare,325.00
+2024-09-18,Mobile Provider,Subscriptions,85.00
+2024-09-19,Design Course,Education,175.00
+2024-09-20,Uber,Transport,24.50
+2024-09-21,Restaurant,Dining,45.75
+2024-09-22,Uber,Transport,21.25
+2024-09-23,Whole Foods,Groceries,129.25
+2024-09-24,Uber,Transport,27.99
+2024-09-25,Co-working Space,Housing,150.00
+2024-09-26,Best Buy,Shopping,229.99
+2024-09-27,Computer Accessories,Shopping,89.99
+2024-09-28,Apple App Store,Subscriptions,9.99
+2024-09-29,Uber,Transport,23.75
+2024-09-30,Ride Share,Transport,46.75
+2024-10-01,Freelance Payment,Income,3500.00
+2024-10-02,Uber,Transport,25.99
+2024-10-03,Coffee Shop,Dining,14.50
+2024-10-04,Adobe Creative Cloud,Subscriptions,52.99
+2024-10-05,Uber,Transport,22.75
+2024-10-06,Office Supply Store,Shopping,95.25
+2024-10-07,Uber,Transport,24.25
+2024-10-08,Whole Foods,Groceries,142.60
+2024-10-09,Apple App Store,Subscriptions,9.99
+2024-10-10,Uber,Transport,26.50
+2024-10-11,Gas Station,Transport,44.25
+2024-10-12,Uber,Transport,21.99
+2024-10-13,Internet Provider,Subscriptions,75.00
+2024-10-14,Amazon Electronics,Shopping,279.99
+2024-10-15,Rent Payment,Housing,950.00
+2024-10-16,Uber,Transport,23.75
+2024-10-17,Health Insurance,Healthcare,325.00
+2024-10-18,Mobile Provider,Subscriptions,85.00
+2024-10-19,Marketing Workshop,Education,150.00
+2024-10-20,Uber,Transport,28.25
+2024-10-21,Restaurant,Dining,52.50
+2024-10-22,Uber,Transport,25.75
+2024-10-23,Whole Foods,Groceries,136.85
+2024-10-24,Uber,Transport,24.99
+2024-10-25,Co-working Space,Housing,150.00
+2024-10-26,Microsoft Store,Shopping,199.99
+2024-10-27,External Hard Drive,Shopping,129.99
+2024-10-28,Apple App Store,Subscriptions,9.99
+2024-10-29,Uber,Transport,26.25
+2024-10-30,Ride Share,Transport,49.75
+2024-10-31,Uber,Transport,22.50
+2024-11-01,Freelance Payment,Income,3100.00
+2024-11-02,Coding Bootcamp,Education,299.99
+2024-11-03,Uber,Transport,27.75
+2024-11-04,Coffee Shop,Dining,16.25
+2024-11-05,Adobe Creative Cloud,Subscriptions,52.99
+2024-11-06,Uber,Transport,23.99
+2024-11-07,Office Supply Store,Shopping,82.45
+2024-11-08,Uber,Transport,25.50
+2024-11-09,Whole Foods,Groceries,149.30
+2024-11-10,Apple App Store,Subscriptions,9.99
+2024-11-11,Uber,Transport,24.75
+2024-11-12,Gas Station,Transport,46.85
+2024-11-13,Uber,Transport,26.25
+2024-11-14,Internet Provider,Subscriptions,75.00
+2024-11-15,Amazon Electronics,Shopping,349.99
+2024-11-16,Rent Payment,Housing,950.00
+2024-11-17,Uber,Transport,22.99
+2024-11-18,Health Insurance,Healthcare,325.00
+2024-11-19,Mobile Provider,Subscriptions,85.00
+2024-11-20,Freelancer Conference,Education,225.00
+2024-11-21,Uber,Transport,29.50
+2024-11-22,Restaurant,Dining,48.75
+2024-11-23,Uber,Transport,24.25
+2024-11-24,Whole Foods,Groceries,141.50
+2024-11-25,Uber,Transport,27.99
+2024-11-26,Co-working Space,Housing,150.00
+2024-11-27,Best Buy,Shopping,189.99
+2024-11-28,Software Subscription,Shopping,79.99
+2024-11-29,Apple App Store,Subscriptions,9.99
+2024-11-30,Uber,Transport,25.75
+2024-12-01,Freelance Payment,Income,3800.00
+2024-12-02,Ride Share,Transport,51.25
+2024-12-03,Uber,Transport,26.99
+2024-12-04,Coffee Shop,Dining,15.75
+2024-12-05,Adobe Creative Cloud,Subscriptions,52.99
+2024-12-06,Uber,Transport,28.25
+2024-12-07,Office Supply Store,Shopping,98.75
+2024-12-08,Uber,Transport,24.75
+2024-12-09,Whole Foods,Groceries,156.40
+2024-12-10,Apple App Store,Subscriptions,9.99
+2024-12-11,Uber,Transport,27.50
+2024-12-12,Gas Station,Transport,49.95
+2024-12-13,Uber,Transport,25.99
+2024-12-14,Internet Provider,Subscriptions,75.00
+2024-12-15,Amazon Electronics,Shopping,399.99
+2024-12-16,Rent Payment,Housing,950.00
+2024-12-17,Uber,Transport,26.75
+2024-12-18,Health Insurance,Healthcare,325.00
+2024-12-19,Mobile Provider,Subscriptions,85.00
+2024-12-20,Business Networking,Education,85.00
+2024-12-21,Uber,Transport,32.25
+2024-12-22,Restaurant,Dining,55.99
+2024-12-23,Uber,Transport,29.75
+2024-12-24,Whole Foods,Groceries,152.25
+2024-12-25,Uber,Transport,31.50
+2024-12-26,Co-working Space,Housing,150.00
+2024-12-27,Microsoft Store,Shopping,249.99
+2024-12-28,Year-End Software,Shopping,149.99
+2024-12-29,Apple App Store,Subscriptions,9.99
+2024-12-30,Uber,Transport,28.99
+2024-12-31,Ride Share,Transport,54.75

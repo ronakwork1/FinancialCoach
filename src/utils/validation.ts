@@ -113,3 +113,4 @@ export const isStrongPassword = (password: string): boolean => {
   const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   return re.test(password);
 };
+

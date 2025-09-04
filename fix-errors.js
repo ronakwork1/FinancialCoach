@@ -30,3 +30,4 @@ const filesToFix = [
 filesToFix.forEach(fixGridComponentsInFile);
 
 console.log('All files fixed successfully!');
+

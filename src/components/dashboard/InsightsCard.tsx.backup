@@ -1,0 +1,495 @@
+import React, { useMemo } from 'react';
+import {
+  Box,
+  Typography,
+  Chip,
+  useTheme,
+  Avatar
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import WarningIcon from '@mui/icons-material/Warning';
+import { useFinancial } from '../../context/FinancialContext';
+
+interface InsightType {
+  text: string;
+  type: 'positive' | 'warning' | 'info';
+}
+
+interface InsightsCardProps {
+  insights: InsightType[];
+}
+
+const InsightsCard: React.FC<InsightsCardProps> = ({ insights: propInsights }) => {
+  const theme = useTheme();
+  const { financialData } = useFinancial();
+
+  // Generate comprehensive insights based on transaction data
+  const transactionInsights = useMemo(() => {
+    const transactions = financialData.transactions;
+    const generatedInsights: InsightType[] = [];
+
+    // If no transactions, return provided insights
+    if (transactions.length === 0) {
+      return propInsights;
+    }
+
+    // Group transactions by category and type
+    const expensesByCategory: Record<string, number> = {};
+    const incomeBySource: Record<string, number> = {};
+    const transactionCountByCategory: Record<string, number> = {};
+
+    transactions.forEach(transaction => {
+      if (transaction.type === 'expense') {
+        expensesByCategory[transaction.category] = (expensesByCategory[transaction.category] || 0) + transaction.amount;
+        transactionCountByCategory[transaction.category] = (transactionCountByCategory[transaction.category] || 0) + 1;
+      } else {
+        incomeBySource[transaction.description] = (incomeBySource[transaction.description] || 0) + transaction.amount;
+      }
+    });
+
+    // Calculate totals
+    const totalIncome = Object.values(incomeBySource).reduce((sum, amount) => sum + amount, 0);
+    const totalExpenses = Object.values(expensesByCategory).reduce((sum, amount) => sum + amount, 0);
+    const savingsRate = totalIncome > 0 ? (totalIncome - totalExpenses) / totalIncome : 0;
+
+    // Group transactions by time periods
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const currentMonthTransactions = transactions.filter(t => {
+      const date = new Date(t.date);
+      return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    });
+
+    const lastMonthTransactions = transactions.filter(t => {
+      const date = new Date(t.date);
+      const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+      const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+      return date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear;
+    });
+
+    const currentMonthExpenses = currentMonthTransactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const lastMonthExpenses = lastMonthTransactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    // Sort categories by amount and transaction count
+    const sortedCategories = Object.entries(expensesByCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([category, amount]) => ({
+        category,
+        amount,
+        count: transactionCountByCategory[category] || 0,
+        average: (transactionCountByCategory[category] || 0) > 0 ? amount / transactionCountByCategory[category] : 0
+      }));
+
+    // 1. Spending Trend Analysis
+    if (lastMonthExpenses > 0) {
+      const percentChange = ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100;
+      if (Math.abs(percentChange) > 5) {
+        generatedInsights.push({
+          text: `Spending ${percentChange > 0 ? 'increased' : 'decreased'} by ${Math.abs(Math.round(percentChange))}% compared to last month`,
+          type: percentChange > 15 ? 'warning' : percentChange < -10 ? 'positive' : 'info'
+        });
+      }
+    }
+
+    // 2. Top Category Analysis
+    if (sortedCategories.length > 0) {
+      const topCategory = sortedCategories[0];
+      const percentOfTotal = totalExpenses > 0 ? (topCategory.amount / totalExpenses) * 100 : 0;
+
+      if (percentOfTotal > 35) {
+        generatedInsights.push({
+          text: `${topCategory.category} dominates your budget at ${Math.round(percentOfTotal)}% of total spending`,
+          type: 'warning'
+        });
+      } else if (percentOfTotal > 25) {
+        generatedInsights.push({
+          text: `${topCategory.category} is your biggest expense at ${Math.round(percentOfTotal)}% of total spending`,
+          type: 'info'
+        });
+      }
+    }
+
+    // 3. Savings Rate Analysis
+    if (savingsRate > 0.25) {
+      generatedInsights.push({
+        text: `Excellent! You're saving ${Math.round(savingsRate * 100)}% of your income - keep it up!`,
+        type: 'positive'
+      });
+    } else if (savingsRate < 0) {
+      generatedInsights.push({
+        text: `Alert: You're spending $${Math.abs(Math.round(totalExpenses - totalIncome))} more than you earn`,
+        type: 'warning'
+      });
+    } else if (savingsRate < 0.05) {
+      generatedInsights.push({
+        text: `Consider saving at least 5-10% of your income for financial security`,
+        type: 'info'
+      });
+    }
+
+    // 4. Transaction Frequency Analysis
+    const totalTransactions = transactions.length;
+    const averageTransactionSize = totalTransactions > 0 ? totalExpenses / totalTransactions : 0;
+
+    if (averageTransactionSize < 50 && totalTransactions > 20) {
+      generatedInsights.push({
+        text: `You make many small purchases (avg $${Math.round(averageTransactionSize)}) - consider bulk buying`,
+        type: 'info'
+      });
+    }
+
+    // 5. Category Diversity Analysis
+    const categoryCount = sortedCategories.length;
+    if (categoryCount < 3 && totalTransactions > 10) {
+      generatedInsights.push({
+        text: `Your spending is concentrated in few categories. Consider diversifying your expenses`,
+        type: 'info'
+      });
+    }
+
+    // 6. Large Transaction Analysis
+    const largeTransactions = transactions.filter(t =>
+      t.type === 'expense' && t.amount > totalExpenses * 0.1
+    );
+
+    if (largeTransactions.length > 0) {
+      const largeTotal = largeTransactions.reduce((sum, t) => sum + t.amount, 0);
+      const largePercent = (largeTotal / totalExpenses) * 100;
+      generatedInsights.push({
+        text: `Large purchases (${Math.round(largePercent)}% of spending) are impacting your budget`,
+        type: largePercent > 50 ? 'warning' : 'info'
+      });
+    }
+
+    // 7. Weekly Spending Pattern
+    const weeklySpending: Record<number, number> = {};
+    transactions.forEach(t => {
+      if (t.type === 'expense') {
+        const date = new Date(t.date);
+        const weekDay = date.getDay();
+        weeklySpending[weekDay] = (weeklySpending[weekDay] || 0) + t.amount;
+      }
+    });
+
+    const highestDay = Object.entries(weeklySpending)
+      .sort((a, b) => b[1] - a[1])[0];
+
+    if (highestDay) {
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const dayName = dayNames[parseInt(highestDay[0])];
+      generatedInsights.push({
+        text: `${dayName}s are your highest spending days - plan ahead for these`,
+        type: 'info'
+      });
+    }
+
+    // 8. Income vs Expense Comparison
+    const incomeSources = Object.keys(incomeBySource).length;
+    if (incomeSources > 1) {
+      generatedInsights.push({
+        text: `You have ${incomeSources} income sources - consider consolidating for simplicity`,
+        type: 'info'
+      });
+    }
+
+    // 9. Budget Adherence Analysis (if budgets exist)
+    if (financialData.budgets && financialData.budgets.length > 0) {
+      const budgetCategories = financialData.budgets;
+      const overBudgetCategories = budgetCategories.filter(budget => {
+        const spent = expensesByCategory[budget.category] || 0;
+        return spent > budget.budget * 0.9;
+      });
+
+      if (overBudgetCategories.length > 0) {
+        generatedInsights.push({
+          text: `${overBudgetCategories.length} budget${overBudgetCategories.length > 1 ? 's' : ''} ${overBudgetCategories.length > 1 ? 'are' : 'is'} close to being exceeded`,
+          type: 'warning'
+        });
+      }
+    }
+
+    // 10. Financial Health Score Integration
+    if (sortedCategories.length >= 3) {
+      const topThreeTotal = sortedCategories.slice(0, 3).reduce((sum, cat) => sum + cat.amount, 0);
+      const concentrationRatio = (topThreeTotal / totalExpenses) * 100;
+
+      if (concentrationRatio > 70) {
+        generatedInsights.push({
+          text: `Your spending is highly concentrated in top 3 categories (${Math.round(concentrationRatio)}%)`,
+          type: 'warning'
+        });
+      }
+    }
+
+    // Ensure we have at least some insights
+    if (generatedInsights.length === 0) {
+      if (totalTransactions > 0) {
+        generatedInsights.push({
+          text: `You've made ${totalTransactions} transactions totaling $${totalExpenses.toLocaleString()}`,
+          type: 'info'
+        });
+      }
+      if (totalIncome > 0) {
+        generatedInsights.push({
+          text: `Your total income is $${totalIncome.toLocaleString()} with a ${savingsRate > 0 ? 'positive' : 'negative'} savings rate`,
+          type: savingsRate > 0 ? 'positive' : 'warning'
+        });
+      }
+    }
+
+    // Sort insights by priority (warnings first, then positive, then info)
+    generatedInsights.sort((a, b) => {
+      const priorityOrder = { warning: 0, positive: 1, info: 2 };
+      return priorityOrder[a.type] - priorityOrder[b.type];
+    });
+
+    // Limit to 6 most important insights
+    return generatedInsights.slice(0, 6);
+  }, [financialData.transactions, financialData.budgets, propInsights]);
+
+  // Get icon based on insight type
+  const getIcon = (type: string) => {
+    const iconSx = {
+      fontSize: { xs: 18, sm: 22 },
+      color: type === 'positive' ? theme.palette.success.main :
+             type === 'warning' ? theme.palette.warning.main :
+             theme.palette.info.main
+    };
+
+    switch (type) {
+      case 'positive':
+        return <TrendingUpIcon sx={iconSx} />;
+      case 'warning':
+        return <WarningIcon sx={iconSx} />;
+      case 'info':
+      default:
+        return <LightbulbIcon sx={iconSx} />;
+    }
+  };
+
+  // Use transaction insights if available, otherwise use provided insights
+  const displayInsights = transactionInsights.length > 0 ? transactionInsights : propInsights;
+
+  return (
+    <Box sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: { xs: 3, sm: 4 }
+    }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        mb: { xs: 2, sm: 3 },
+        flexShrink: 0,
+        p: { xs: 2, sm: 2.5 },
+        borderRadius: { xs: 2, sm: 3 },
+        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.04)} 100%)`,
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+        boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.1)}`
+      }}>
+        <Box sx={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mr: { xs: 2, sm: 3 }
+        }}>
+          <CircularProgress
+            variant="determinate"
+            value={100}
+            size={80}
+            thickness={3}
+            sx={{
+              color: alpha(theme.palette.primary.main, 0.2)
+            }}
+          />
+          <CircularProgress
+            variant="determinate"
+            value={displayInsights.length > 0 ? Math.min((displayInsights.length / 6) * 100, 100) : 0}
+            size={80}
+            thickness={3}
+            sx={{
+              color: theme.palette.primary.main,
+              position: 'absolute',
+              filter: `drop-shadow(0 0 8px ${alpha(theme.palette.primary.main, 0.3)})`
+            }}
+          />
+          <Box sx={{
+            position: 'absolute',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column'
+          }}>
+            <LightbulbIcon sx={{
+              fontSize: { xs: 24, sm: 28 },
+              color: theme.palette.primary.main
+            }} />
+          </Box>
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+              lineHeight: 1.2,
+              color: theme.palette.text.primary,
+              mb: 1,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            AI Financial Insights
+          </Typography>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            mb: 1
+          }}>
+            <Chip
+              label={`${displayInsights.length} insights`}
+              size="small"
+              sx={{
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: theme.palette.primary.main,
+                fontWeight: 600,
+                fontSize: '0.7rem'
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme.palette.text.secondary,
+                fontSize: '0.75rem',
+                fontWeight: 500
+              }}
+            >
+              AI Powered
+            </Typography>
+          </Box>
+          <Typography
+            variant="body2"
+            sx={{
+              color: theme.palette.text.secondary,
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              fontWeight: 500,
+              opacity: 0.8,
+              lineHeight: 1.4
+            }}
+          >
+            Personalized financial insights based on your spending patterns
+          </Typography>
+        </Box>
+      </Box>
+
+      {displayInsights.length > 0 && (
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{
+            display: 'grid',
+            gap: { xs: 2, sm: 2.5 },
+            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }
+          }}>
+            {displayInsights.map((insight, index) => (
+              <Box key={index} sx={{ p: 2 }}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: { xs: 1.5, sm: 2 }
+                }}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: { xs: 36, sm: 44 },
+                  height: { xs: 36, sm: 44 },
+                  borderRadius: 2,
+                  bgcolor: alpha(
+                    insight.type === 'positive' ? theme.palette.success.main :
+                    insight.type === 'warning' ? theme.palette.warning.main :
+                    theme.palette.info.main, 0.1
+                  ),
+                  border: `1px solid ${alpha(
+                    insight.type === 'positive' ? theme.palette.success.main :
+                    insight.type === 'warning' ? theme.palette.warning.main :
+                    theme.palette.info.main, 0.2
+                  )}`,
+                  flexShrink: 0,
+                  mt: 0.5
+                }}>
+                  {getIcon(insight.type)}
+                </Box>
+
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: theme.palette.text.primary,
+                      fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                      lineHeight: 1.5,
+                      fontWeight: 500,
+                      mb: 1.5
+                    }}
+                  >
+                    {insight.text}
+                  </Typography>
+
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}>
+                    <Chip
+                      label={
+                        insight.type === 'positive' ? 'Positive' :
+                        insight.type === 'warning' ? 'Warning' :
+                        'Info'
+                      }
+                      size="small"
+                      sx={{
+                        bgcolor: `${alpha(insight.type === 'positive' ? theme.palette.success.main : insight.type === 'warning' ? theme.palette.warning.main : theme.palette.info.main, 0.15)}`,
+                        color: `${insight.type === 'positive' ? theme.palette.success.main : insight.type === 'warning' ? theme.palette.warning.main : theme.palette.info.main}`,
+                                          border: `1px solid ${alpha(insight.type === 'positive' ? theme.palette.success.main : insight.type === 'warning' ? theme.palette.warning.main : theme.palette.info.main, 0.3)}`,
+                        fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                        fontWeight: 600,
+                        height: { xs: 24, sm: 28 },
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        fontSize: '0.7rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      {insight.type === 'positive' ? '💡 Great news' :
+                       insight.type === 'warning' ? '⚠️ Pay attention' :
+                       'ℹ️ Information'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          ))
+        </Box>
+      )}
+      </Box>
+    </Box>
+  );
+};
+
+export default InsightsCard;

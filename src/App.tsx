@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { ThemeProvider, CssBaseline, Box, Tab, Tabs, Typography, Paper } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { ThemeProvider, CssBaseline, Box, Tab, Tabs, Typography, Paper, Button } from '@mui/material';
 import theme from './theme/theme';
 import Layout from './components/layout/Layout';
 import Dashboard from './components/dashboard/Dashboard';
-import FinancialDataForm from './components/forms/FinancialDataForm';
+import WelcomeScreen from './components/welcome/WelcomeScreen';
+import TransactionPage from './components/pages/TransactionPage';
+import BudgetPage from './components/pages/BudgetPage';
+import AICoachPage from './components/pages/AICoachPage';
 import { FinancialProvider } from './context/FinancialContext';
-import InsightsIcon from '@mui/icons-material/Insights';
 import SettingsIcon from '@mui/icons-material/Settings';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import InsightsIcon from '@mui/icons-material/Insights';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -31,6 +33,38 @@ const TabPanel = (props: TabPanelProps) => {
   );
 };
 
+// Component to redirect users to transactions page for data entry
+interface EnterDataRedirectProps {
+  onNavigate: (page: string) => void;
+}
+
+const EnterDataRedirect: React.FC<EnterDataRedirectProps> = ({ onNavigate }) => (
+  <Box sx={{ textAlign: 'center', py: 8 }}>
+    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+      Enter Your Financial Data
+    </Typography>
+    <Typography variant="body1" paragraph sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+      To add new transactions and financial data, please navigate to the Transactions page.
+      This ensures all your data entry happens in one centralized location for better organization.
+    </Typography>
+    <Button
+      variant="contained"
+      color="primary"
+      size="large"
+      onClick={() => onNavigate('transactions')}
+      sx={{
+        px: 4,
+        py: 1.5,
+        borderRadius: 2,
+        textTransform: 'none',
+        fontWeight: 600
+      }}
+    >
+      Go to Transactions Page
+    </Button>
+  </Box>
+);
+
 // Placeholder components for other pages
 const InsightsPage: React.FC = () => (
   <Box>
@@ -51,30 +85,6 @@ const InsightsPage: React.FC = () => (
       </Typography>
       <Typography>
         Enter your financial data in the "Enter Data" tab to get started with personalized insights.
-      </Typography>
-    </Paper>
-  </Box>
-);
-
-const BudgetPage: React.FC = () => (
-  <Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-      <AccountBalanceWalletIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-        Budget Management
-      </Typography>
-    </Box>
-    <Paper elevation={0} sx={{ p: 4, borderRadius: 2, border: '1px solid rgba(0, 0, 0, 0.05)' }}>
-      <Typography variant="h6" gutterBottom>
-        Budget Planning and Tracking
-      </Typography>
-      <Typography paragraph>
-        This page will allow you to create and manage detailed budgets for different categories.
-        You'll be able to set spending limits, track your progress, and receive alerts when you're
-        approaching your budget limits.
-      </Typography>
-      <Typography>
-        Enter your financial data in the "Enter Data" tab to start creating your personalized budget.
       </Typography>
     </Paper>
   </Box>
@@ -105,7 +115,19 @@ const SettingsPage: React.FC = () => (
 
 const App: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('welcome');
+
+  
+  // Always show welcome screen on refresh
+  useEffect(() => {
+    // Remove this line to always show welcome screen
+    // const hasVisited = localStorage.getItem('hasVisitedBefore');
+    // if (hasVisited) {
+    //   setIsFirstVisit(false);
+    //   setCurrentPage('dashboard');
+    // }
+    setCurrentPage('welcome');
+  }, []);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -119,13 +141,25 @@ const App: React.FC = () => {
     }
   };
   
-  // Handle switching to the Enter Data tab
+  // Handle navigating to transactions page for entering data
   const handleEnterData = () => {
-    setTabValue(1);
+    handleNavigate('transactions');
+  };
+
+  // Handle welcome screen completion
+  const handleWelcomeComplete = (page: string) => {
+    // Mark that user has visited before
+    localStorage.setItem('hasVisitedBefore', 'true');
+    setCurrentPage(page);
   };
 
   // Render content based on current page
   const renderContent = () => {
+    // Show welcome screen for first visit or if explicitly navigated to
+    if (currentPage === 'welcome') {
+      return <WelcomeScreen onComplete={handleWelcomeComplete} />;
+    }
+    
     switch (currentPage) {
       case 'dashboard':
         return (
@@ -159,10 +193,10 @@ const App: React.FC = () => {
               </Tabs>
             </Box>
             <TabPanel value={tabValue} index={0}>
-              <Dashboard onEnterData={handleEnterData} />
+              <Dashboard onEnterData={handleEnterData} onNavigate={handleNavigate} />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-              <FinancialDataForm />
+              <EnterDataRedirect onNavigate={handleNavigate} />
             </TabPanel>
           </Box>
         );
@@ -170,10 +204,14 @@ const App: React.FC = () => {
         return <InsightsPage />;
       case 'budget':
         return <BudgetPage />;
+      case 'ai-coach':
+        return <AICoachPage />;
+      case 'transactions':
+        return <TransactionPage />;
       case 'settings':
         return <SettingsPage />;
       default:
-        return <Dashboard onEnterData={handleEnterData} />;
+        return <Dashboard onEnterData={handleEnterData} onNavigate={handleNavigate} />;
     }
   };
 

@@ -21,6 +21,8 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 
 interface HeaderProps {
   toggleDrawer?: () => void;
@@ -115,9 +117,9 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, onNavigate }) => {
           
           {!isMobile && (
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button 
-                color="inherit" 
-                sx={{ 
+              <Button
+                color="inherit"
+                sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   px: 2,
@@ -129,9 +131,53 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, onNavigate }) => {
               >
                 Dashboard
               </Button>
-              <Button 
+              <Button
                 color="inherit"
-                sx={{ 
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  px: 2,
+                  '&:hover': {
+                    backgroundColor: alpha('#fff', 0.1)
+                  }
+                }}
+                onClick={() => onNavigate('transactions')}
+              >
+                Transactions
+              </Button>
+                            <Button
+                color="inherit"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  px: 2,
+                  '&:hover': {
+                    backgroundColor: alpha('#fff', 0.1)
+                  }
+                }}
+                onClick={() => onNavigate('budget')}
+                startIcon={<AccountBalanceWalletIcon />}
+              >
+                Budget
+              </Button>
+              <Button
+                color="inherit"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  px: 2,
+                  '&:hover': {
+                    backgroundColor: alpha('#fff', 0.1)
+                  }
+                }}
+                onClick={() => onNavigate('ai-coach')}
+                startIcon={<PsychologyIcon />}
+              >
+                AI Coach
+              </Button>
+              <Button
+                color="inherit"
+                sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   px: 2,
@@ -142,20 +188,6 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, onNavigate }) => {
                 onClick={() => onNavigate('insights')}
               >
                 Insights
-              </Button>
-              <Button 
-                color="inherit"
-                sx={{ 
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  px: 2,
-                  '&:hover': {
-                    backgroundColor: alpha('#fff', 0.1)
-                  }
-                }}
-                onClick={() => onNavigate('budget')}
-              >
-                Budget
               </Button>
             </Box>
           )}

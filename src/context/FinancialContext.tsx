@@ -24,6 +24,14 @@ export interface FinancialGoal {
   targetDate: string;
 }
 
+export interface VariableIncome {
+  id: string;
+  month: string; // YYYY-MM format
+  amount: number;
+  description: string;
+  type: 'salary' | 'bonus' | 'freelance' | 'investment' | 'other';
+}
+
 export interface FinancialData {
   transactions: Transaction[];
   budgets: Budget[];
@@ -33,6 +41,7 @@ export interface FinancialData {
     additionalIncome: string;
     frequency: string;
   };
+  variableIncome: VariableIncome[];
   expenses: {
     housing: string;
     utilities: string;
@@ -50,6 +59,14 @@ export interface FinancialData {
   };
 }
 
+// Define CSV data format for import/export
+export interface CSVTransaction {
+  date: string;
+  merchant: string;
+  category: string;
+  amount: string;
+}
+
 interface FinancialContextType {
   financialData: FinancialData;
   updateIncome: (income: FinancialData['income']) => void;
@@ -62,9 +79,14 @@ interface FinancialContextType {
   addGoal: (goal: Omit<FinancialGoal, 'id'>) => void;
   updateGoal: (goal: FinancialGoal) => void;
   deleteGoal: (id: string) => void;
+  addVariableIncome: (income: Omit<VariableIncome, 'id'>) => void;
+  updateVariableIncome: (income: VariableIncome) => void;
+  deleteVariableIncome: (id: string) => void;
+  getVariableIncomeForMonth: (month: string) => number;
   calculateFinancialHealth: () => number;
   getInsights: () => { text: string; type: 'positive' | 'warning' | 'info' }[];
   clearAllData: () => void;
+  setTransactionData: (csvTransactions: CSVTransaction[]) => void;
 }
 
 // Initial default data
@@ -84,6 +106,7 @@ const initialFinancialData: FinancialData = {
     additionalIncome: '',
     frequency: 'monthly',
   },
+  variableIncome: [],
   expenses: {
     housing: '',
     utilities: '',
@@ -306,6 +329,44 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({ children 
     }));
   };
 
+  // Add variable income entry
+  const addVariableIncome = (income: Omit<VariableIncome, 'id'>) => {
+    const newIncome = {
+      ...income,
+      id: Date.now().toString(),
+    };
+
+    setFinancialData(prev => ({
+      ...prev,
+      variableIncome: [...prev.variableIncome, newIncome],
+    }));
+  };
+
+  // Update variable income entry
+  const updateVariableIncome = (income: VariableIncome) => {
+    setFinancialData(prev => ({
+      ...prev,
+      variableIncome: prev.variableIncome.map(vi =>
+        vi.id === income.id ? income : vi
+      ),
+    }));
+  };
+
+  // Delete variable income entry
+  const deleteVariableIncome = (id: string) => {
+    setFinancialData(prev => ({
+      ...prev,
+      variableIncome: prev.variableIncome.filter(vi => vi.id !== id),
+    }));
+  };
+
+  // Get total variable income for a specific month
+  const getVariableIncomeForMonth = (month: string) => {
+    return financialData.variableIncome
+      .filter(income => income.month === month)
+      .reduce((sum, income) => sum + income.amount, 0);
+  };
+
   // Calculate financial health score (0-100)
   const calculateFinancialHealth = (): number => {
     let score = 0;
@@ -415,6 +476,60 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({ children 
     localStorage.removeItem('financialData');
   };
 
+  // Import transaction data from CSV
+  const setTransactionData = (csvTransactions: CSVTransaction[]) => {
+    // Convert CSV transactions to our internal Transaction format
+    const transactions: Transaction[] = csvTransactions.map((csvTx) => {
+      const amount = parseFloat(csvTx.amount);
+      const isIncome = csvTx.category.toLowerCase() === 'income';
+      
+      return {
+        id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+        date: csvTx.date,
+        amount: amount,
+        category: csvTx.category,
+        description: csvTx.merchant,
+        type: isIncome ? 'income' : 'expense'
+      };
+    });
+
+    // Update transactions in state
+    setFinancialData(prev => ({
+      ...prev,
+      transactions: [...transactions]
+    }));
+
+    // Calculate budget data from transactions
+    const categoryTotals: Record<string, number> = {};
+    
+    // Group non-income transactions by category
+    transactions.forEach(tx => {
+      if (tx.type === 'expense') {
+        if (!categoryTotals[tx.category]) {
+          categoryTotals[tx.category] = 0;
+        }
+        categoryTotals[tx.category] += tx.amount;
+      }
+    });
+
+    // Update budgets with new spent amounts
+    const updatedBudgets = financialData.budgets.map(budget => {
+      const categorySpent = categoryTotals[budget.category] || 0;
+      return {
+        ...budget,
+        spent: categorySpent,
+        // Set a reasonable budget based on spending
+        budget: Math.max(budget.budget, Math.ceil(categorySpent * 1.1 / 100) * 100)
+      };
+    });
+
+    // Update budgets in state
+    setFinancialData(prev => ({
+      ...prev,
+      budgets: updatedBudgets
+    }));
+  };
+
   return (
     <FinancialContext.Provider
       value={{
@@ -429,9 +544,14 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({ children 
         addGoal,
         updateGoal,
         deleteGoal,
+        addVariableIncome,
+        updateVariableIncome,
+        deleteVariableIncome,
+        getVariableIncomeForMonth,
         calculateFinancialHealth,
         getInsights,
         clearAllData,
+        setTransactionData,
       }}
     >
       {children}

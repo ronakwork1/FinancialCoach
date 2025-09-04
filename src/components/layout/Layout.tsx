@@ -41,6 +41,8 @@ const Layout: React.FC<LayoutProps> = ({ children, onNavigate, currentPage }) =>
     { text: 'Insights', icon: <InsightsIcon />, page: 'insights' },
     { text: 'Budget', icon: <AccountBalanceWalletIcon />, page: 'budget' },
     { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
+    // Hidden item for welcome screen
+    { text: 'Welcome', icon: <DashboardIcon />, page: 'welcome', hidden: true },
   ];
 
   const handleNavigation = (page: string) => {
@@ -76,7 +78,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onNavigate, currentPage }) =>
       </Box>
       <Divider />
       <List sx={{ pt: 2 }}>
-        {drawerItems.map((item) => (
+        {drawerItems.filter(item => !item.hidden).map((item) => (
           <ListItemButton 
             key={item.text}
             onClick={() => handleNavigation(item.page)}
@@ -166,8 +168,25 @@ const Layout: React.FC<LayoutProps> = ({ children, onNavigate, currentPage }) =>
         <Toolbar /> {/* This creates space for the fixed app bar */}
         <PrivacyBanner />
         
-        <Container maxWidth="lg" sx={{ mt: 2, px: { xs: 2, sm: 3 }, py: 3 }}>
-          {children}
+        <Container
+          maxWidth="xl"
+          sx={{
+            mt: { xs: 1, sm: 2 },
+            px: { xs: 1, sm: 2, md: 3 },
+            py: { xs: 2, sm: 3 },
+            minHeight: 'calc(100vh - 64px - 120px)', // Account for header and footer
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <Box sx={{
+            flex: 1,
+            width: '100%',
+            maxWidth: '100%',
+            overflow: 'hidden'
+          }}>
+            {children}
+          </Box>
         </Container>
         
         <Footer />
