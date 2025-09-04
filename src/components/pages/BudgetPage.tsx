@@ -17,6 +17,10 @@ import {
   alpha,
   IconButton,
   Tooltip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 
   List,
   ListItem,
@@ -35,6 +39,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import HomeIcon from '@mui/icons-material/Home';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import SchoolIcon from '@mui/icons-material/School';
 import { useFinancial } from '../../context/FinancialContext';
 
 const BudgetPage: React.FC = () => {
@@ -44,15 +49,85 @@ const BudgetPage: React.FC = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [newBudgetLimit, setNewBudgetLimit] = useState<string>('');
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('current');
+
+  // Get the most recent transaction date from the data
+  const getMostRecentTransactionDate = useMemo(() => {
+    if (financialData.transactions.length === 0) return new Date();
+
+    const sortedTransactions = [...financialData.transactions].sort((a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    return new Date(sortedTransactions[0].date);
+  }, [financialData.transactions]);
+
+  // Helper function to filter transactions based on selected period
+  const getFilteredTransactions = (transactions: any[], period: string) => {
+    const referenceDate = getMostRecentTransactionDate;
+    const currentMonth = referenceDate.getMonth();
+    const currentYear = referenceDate.getFullYear();
+
+    switch (period) {
+      case 'current':
+        return transactions.filter(tx => {
+          const txDate = new Date(tx.date);
+          return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        });
+      case 'lastMonth':
+        const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+        const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+        return transactions.filter(tx => {
+          const txDate = new Date(tx.date);
+          return txDate.getMonth() === lastMonth && txDate.getFullYear() === lastMonthYear;
+        });
+      case 'last3Months':
+        const threeMonthsAgo = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - 3, 1);
+        return transactions.filter(tx => new Date(tx.date) >= threeMonthsAgo);
+      case 'all':
+        return transactions;
+      default:
+        return transactions.filter(tx => {
+          const txDate = new Date(tx.date);
+          return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        });
+    }
+  };
 
   // Extract unique categories from transaction data and assign icons/colors
   const budgetCategories = useMemo(() => {
     const uniqueCategories = new Set<string>();
 
-    // Get all unique expense categories from transactions (exclude income)
+    // Map transaction categories to standard budget categories
+    const categoryMapping: Record<string, string> = {
+      'groceries': 'Food',
+      'dining': 'Food',
+      'food': 'Food',
+      'transport': 'Transportation',
+      'transportation': 'Transportation',
+      'housing': 'Housing',
+      'subscriptions': 'Entertainment',
+      'entertainment': 'Entertainment',
+      'shopping': 'Shopping',
+      'utilities': 'Utilities',
+      'healthcare': 'Healthcare',
+      'education': 'Education',
+      'medical': 'Healthcare',
+      'gas': 'Transportation',
+      'car': 'Transportation',
+      'rent': 'Housing',
+      'mortgage': 'Housing',
+      'electricity': 'Utilities',
+      'water': 'Utilities',
+      'internet': 'Utilities'
+    };
+
+    // Get all unique expense categories from transactions (exclude income) and map them
     financialData.transactions.forEach(tx => {
       if (tx.type === 'expense') {
-        uniqueCategories.add(tx.category);
+        const rawCategory = tx.category.toLowerCase();
+        const mappedCategory = categoryMapping[rawCategory] || tx.category;
+        uniqueCategories.add(mappedCategory);
       }
     });
 
@@ -80,6 +155,7 @@ const BudgetPage: React.FC = () => {
       'Car': { icon: <DirectionsCarIcon />, color: theme.palette.success.main },
       'Healthcare': { icon: <LocalHospitalIcon />, color: theme.palette.error.main },
       'Medical': { icon: <LocalHospitalIcon />, color: theme.palette.error.main },
+      'Education': { icon: <SchoolIcon />, color: theme.palette.info.main },
       'Entertainment': { icon: <CheckCircleIcon />, color: theme.palette.info.main },
       'Shopping': { icon: <ShoppingCartIcon />, color: theme.palette.primary.dark },
       'Utilities': { icon: <HomeIcon />, color: theme.palette.secondary.dark },
@@ -138,30 +214,92 @@ const BudgetPage: React.FC = () => {
     return categories.sort((a, b) => a.name.localeCompare(b.name));
   }, [financialData.transactions, theme]);
 
-  // Calculate spending by category
+  // Calculate spending by category based on selected period
   const categorySpending = useMemo(() => {
     const spending: Record<string, number> = {};
+    const filteredTransactions = getFilteredTransactions(financialData.transactions, selectedPeriod);
 
-    financialData.transactions.forEach(tx => {
+    // Map transaction categories to standard budget categories
+    const categoryMapping: Record<string, string> = {
+      'groceries': 'Food',
+      'dining': 'Food',
+      'food': 'Food',
+      'transport': 'Transportation',
+      'transportation': 'Transportation',
+      'housing': 'Housing',
+      'subscriptions': 'Entertainment',
+      'entertainment': 'Entertainment',
+      'shopping': 'Shopping',
+      'utilities': 'Utilities',
+      'healthcare': 'Healthcare',
+      'education': 'Education',
+      'medical': 'Healthcare',
+      'gas': 'Transportation',
+      'car': 'Transportation',
+      'rent': 'Housing',
+      'mortgage': 'Housing',
+      'electricity': 'Utilities',
+      'water': 'Utilities',
+      'internet': 'Utilities'
+    };
+
+    filteredTransactions.forEach(tx => {
       if (tx.type === 'expense') {
-        const category = tx.category;
-        spending[category] = (spending[category] || 0) + Math.abs(tx.amount);
+        const rawCategory = tx.category.toLowerCase();
+        const mappedCategory = categoryMapping[rawCategory] || tx.category;
+        spending[mappedCategory] = (spending[mappedCategory] || 0) + Math.abs(tx.amount);
       }
     });
 
     return spending;
-  }, [financialData.transactions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [financialData.transactions, selectedPeriod, getMostRecentTransactionDate]);
 
-  // Get budget data with spending
+  // Calculate budget forecasting for current month
+  const budgetForecasting = useMemo(() => {
+    if (selectedPeriod !== 'current') return {};
+
+    const referenceDate = getMostRecentTransactionDate;
+    const currentMonth = referenceDate.getMonth();
+    const currentYear = referenceDate.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    // Get transactions for the current month to calculate days passed
+    const currentMonthTransactions = getFilteredTransactions(financialData.transactions, 'current');
+    const uniqueDays = new Set(currentMonthTransactions.map(tx => new Date(tx.date).getDate()));
+    const daysPassed = Math.max(uniqueDays.size, 1);
+
+    const forecasts: Record<string, number> = {};
+
+    financialData.budgets.forEach(budget => {
+      const category = budget.category;
+      const currentSpent = categorySpending[category] || 0;
+
+      // Calculate daily spending rate based on actual days with transactions
+      const dailyRate = currentSpent / daysPassed;
+      const projectedTotal = dailyRate * daysInMonth;
+
+      forecasts[category] = projectedTotal;
+    });
+
+    return forecasts;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [financialData.budgets, categorySpending, selectedPeriod, getMostRecentTransactionDate, financialData.transactions]);
+
+  // Get budget data with spending and forecasting
   const budgetData = useMemo(() => {
     return financialData.budgets.map(budget => {
       const spent = categorySpending[budget.category] || 0;
       const percentage = budget.budget > 0 ? (spent / budget.budget) * 100 : 0;
+      const projected = budgetForecasting[budget.category] || 0;
+      const projectedPercentage = budget.budget > 0 ? (projected / budget.budget) * 100 : 0;
 
       let status: 'good' | 'warning' | 'danger' = 'good';
-      if (percentage >= 100) {
+      if (projectedPercentage >= 100 && selectedPeriod === 'current') {
         status = 'danger';
-      } else if (percentage >= 80) {
+      } else if (percentage >= 100) {
+        status = 'danger';
+      } else if (percentage >= 80 || (projectedPercentage >= 80 && selectedPeriod === 'current')) {
         status = 'warning';
       }
 
@@ -169,11 +307,13 @@ const BudgetPage: React.FC = () => {
         ...budget,
         spent,
         percentage,
+        projected,
+        projectedPercentage,
         status,
         remaining: Math.max(0, budget.budget - spent)
       };
     });
-  }, [financialData.budgets, categorySpending]);
+  }, [financialData.budgets, categorySpending, budgetForecasting, selectedPeriod]);
 
   // Generate actionable advice
   const actionableAdvice = useMemo(() => {
@@ -256,6 +396,20 @@ const BudgetPage: React.FC = () => {
     setNewBudgetLimit('');
   };
 
+  // Reset all budgets for new month
+  const handleResetBudgets = () => {
+    // Reset spent amounts for all budgets
+    financialData.budgets.forEach(budget => {
+      updateBudget({
+        ...budget,
+        spent: 0
+      });
+    });
+
+    // Update the selected period to current to refresh the view
+    setSelectedPeriod('current');
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'danger':
@@ -278,8 +432,55 @@ const BudgetPage: React.FC = () => {
     }
   };
 
-  const totalBudget = budgetData.reduce((sum, budget) => sum + budget.budget, 0);
-  const totalSpent = budgetData.reduce((sum, budget) => sum + budget.spent, 0);
+  // Calculate total budget based on income
+  const totalBudget = useMemo(() => {
+    if (selectedPeriod === 'all') {
+      // For all time, use total income from all sources
+      const salary = parseFloat(financialData.income.salary) || 0;
+      const additionalIncome = parseFloat(financialData.income.additionalIncome) || 0;
+      const incomeFromTransactions = financialData.transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+      return salary + additionalIncome + incomeFromTransactions;
+    } else {
+      // For current/last month/last 3 months, use income from that period
+      const filteredTransactions = getFilteredTransactions(financialData.transactions, selectedPeriod === 'current' ? 'current' : selectedPeriod);
+      const incomeFromTransactions = filteredTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      // Also include monthly salary if it's the current month
+      const salary = parseFloat(financialData.income.salary) || 0;
+      const additionalIncome = parseFloat(financialData.income.additionalIncome) || 0;
+
+      if (selectedPeriod === 'current') {
+        // For current month, include monthly salary and additional income
+        return salary + additionalIncome + incomeFromTransactions;
+      } else {
+        // For other periods, only use transaction-based income
+        return incomeFromTransactions;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [financialData.income, financialData.transactions, selectedPeriod]);
+
+  // Calculate total spent - use same method as real-time dashboard for consistency
+  const totalSpent = useMemo(() => {
+    if (selectedPeriod === 'all') {
+      // For all time, sum all expense transactions (same as real-time dashboard)
+      return financialData.transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+    } else {
+      // For other periods, sum expenses from filtered transactions
+      const filteredTransactions = getFilteredTransactions(financialData.transactions, selectedPeriod);
+      return filteredTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [financialData.transactions, selectedPeriod]);
+
   const totalRemaining = totalBudget - totalSpent;
   const overallPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
@@ -302,6 +503,53 @@ const BudgetPage: React.FC = () => {
             Track your spending progress and get personalized savings advice
           </Typography>
         </Box>
+
+        {/* Controls */}
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {/* Time Period Selector */}
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel>Time Period</InputLabel>
+            <Select
+              value={selectedPeriod}
+              label="Time Period"
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              sx={{
+                borderRadius: 2,
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: alpha(theme.palette.primary.main, 0.3)
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: theme.palette.primary.main
+                }
+              }}
+            >
+              <MenuItem value="current">{getMostRecentTransactionDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</MenuItem>
+              <MenuItem value="lastMonth">{new Date(getMostRecentTransactionDate.getFullYear(), getMostRecentTransactionDate.getMonth() - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' })}</MenuItem>
+              <MenuItem value="last3Months">Last 3 Months</MenuItem>
+              <MenuItem value="all">All Time</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Reset Budgets Button */}
+          <Tooltip title="Reset all budgets for new month">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleResetBudgets}
+              sx={{
+                borderRadius: 2,
+                borderColor: alpha(theme.palette.warning.main, 0.5),
+                color: theme.palette.warning.main,
+                '&:hover': {
+                  borderColor: theme.palette.warning.main,
+                  bgcolor: alpha(theme.palette.warning.main, 0.1)
+                }
+              }}
+            >
+              Reset Budgets
+            </Button>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Overall Budget Summary */}
@@ -310,6 +558,10 @@ const BudgetPage: React.FC = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
               Overall Budget Progress
+              {selectedPeriod === 'current' && ` (${getMostRecentTransactionDate.toLocaleString('default', { month: 'long', year: 'numeric' })})`}
+              {selectedPeriod === 'lastMonth' && ` (${new Date(getMostRecentTransactionDate.getFullYear(), getMostRecentTransactionDate.getMonth() - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' })})`}
+              {selectedPeriod === 'last3Months' && ' (Last 3 Months)'}
+              {selectedPeriod === 'all' && ' (All Time)'}
             </Typography>
             <Chip
               label={`${Math.round(overallPercentage)}% Used`}
@@ -353,7 +605,7 @@ const BudgetPage: React.FC = () => {
                 ${totalBudget.toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Total Budget
+                {selectedPeriod === 'all' ? 'Total Income' : 'Monthly Income'}
               </Typography>
             </Box>
             <Box sx={{
@@ -367,7 +619,10 @@ const BudgetPage: React.FC = () => {
                 ${totalSpent.toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Total Spent
+                {selectedPeriod === 'current' && `Spent in ${getMostRecentTransactionDate.toLocaleString('default', { month: 'long' })}`}
+                {selectedPeriod === 'lastMonth' && `Spent in ${new Date(getMostRecentTransactionDate.getFullYear(), getMostRecentTransactionDate.getMonth() - 1, 1).toLocaleString('default', { month: 'long' })}`}
+                {selectedPeriod === 'last3Months' && 'Spent Last 3 Months'}
+                {selectedPeriod === 'all' && 'Total Spent'}
               </Typography>
             </Box>
             <Box sx={{
@@ -481,6 +736,25 @@ const BudgetPage: React.FC = () => {
                         }
                       }}
                     />
+                    {/* Projected spending overlay for current month */}
+                    {selectedPeriod === 'current' && 'projected' in budget && budget.projected > budget.spent && (
+                      <LinearProgress
+                        variant="determinate"
+                        value={Math.min(Math.max(budget.projectedPercentage - budget.percentage, 0), 100)}
+                        sx={{
+                          height: 8,
+                          borderRadius: 4,
+                          mt: -1,
+                          position: 'relative',
+                          bgcolor: 'transparent',
+                          '& .MuiLinearProgress-bar': {
+                            borderRadius: 4,
+                            bgcolor: budget.projectedPercentage > 100 ? alpha(theme.palette.error.main, 0.5) : alpha(theme.palette.warning.main, 0.5),
+                            marginLeft: `${Math.min(budget.percentage, 100)}%`
+                          }
+                        }}
+                      />
+                    )}
                   </Box>
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -492,6 +766,18 @@ const BudgetPage: React.FC = () => {
                     </Typography>
                   </Box>
 
+                  {/* Projected spending for current month */}
+                  {selectedPeriod === 'current' && 'projected' in budget && budget.projected > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Typography variant="body2" sx={{ color: budget.projectedPercentage > 100 ? theme.palette.error.main : theme.palette.warning.main, fontSize: '0.75rem' }}>
+                        Projected: ${budget.projected.toLocaleString()}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: budget.projectedPercentage > 100 ? theme.palette.error.main : theme.palette.warning.main, fontSize: '0.75rem' }}>
+                        {Math.round(budget.projectedPercentage)}%
+                      </Typography>
+                    </Box>
+                  )}
+
                   {budget.status !== 'good' && (
                     <Alert
                       severity={budget.status === 'danger' ? 'error' : 'warning'}
@@ -500,11 +786,33 @@ const BudgetPage: React.FC = () => {
                     >
                       <Typography variant="body2">
                         {budget.status === 'danger'
-                          ? `$${Math.abs(budget.remaining).toLocaleString()} over budget!`
+                          ? selectedPeriod === 'current' && 'projected' in budget && budget.projected > budget.budget
+                            ? `Projected to exceed budget by $${Math.abs(budget.projected - budget.budget).toLocaleString()}`
+                            : `$${Math.abs(budget.remaining).toLocaleString()} over budget!`
+                          : selectedPeriod === 'current' && 'projected' in budget && budget.projected > budget.budget * 0.8
+                          ? `$${budget.remaining.toLocaleString()} remaining, but projected to exceed`
                           : `$${budget.remaining.toLocaleString()} remaining`
                         }
                       </Typography>
                     </Alert>
+                  )}
+
+                  {/* Legend for projected spending */}
+                  {selectedPeriod === 'current' && 'projected' in budget && budget.projected > 0 && (
+                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: theme.palette.primary.main }} />
+                      <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontSize: '0.7rem' }}>
+                        Actual spending
+                      </Typography>
+                      {'projected' in budget && budget.projected > budget.spent && (
+                        <>
+                          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: budget.projectedPercentage > 100 ? theme.palette.error.main : theme.palette.warning.main, opacity: 0.5 }} />
+                          <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontSize: '0.7rem' }}>
+                            Projected
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
                   )}
                 </CardContent>
               </Card>

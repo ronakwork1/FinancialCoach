@@ -7,6 +7,9 @@ import WelcomeScreen from './components/welcome/WelcomeScreen';
 import TransactionPage from './components/pages/TransactionPage';
 import BudgetPage from './components/pages/BudgetPage';
 import AICoachPage from './components/pages/AICoachPage';
+import PrivacyPage from './components/pages/PrivacyPage';
+import TermsPage from './components/pages/TermsPage';
+import AboutPage from './components/pages/AboutPage';
 import { FinancialProvider } from './context/FinancialContext';
 import SettingsIcon from '@mui/icons-material/Settings';
 import InsightsIcon from '@mui/icons-material/Insights';
@@ -210,6 +213,12 @@ const App: React.FC = () => {
         return <TransactionPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'privacy':
+        return <PrivacyPage />;
+      case 'terms':
+        return <TermsPage />;
+      case 'about':
+        return <AboutPage />;
       default:
         return <Dashboard onEnterData={handleEnterData} onNavigate={handleNavigate} />;
     }

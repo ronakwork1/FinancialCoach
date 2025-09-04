@@ -142,8 +142,7 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
       flexDirection: 'column',
       gap: { xs: 3, sm: 4 },
       width: '100%',
-      minWidth: 0,
-      overflow: 'hidden'
+      minWidth: 0
     }}>
       {/* Main Score Display */}
       <Box sx={{
@@ -159,7 +158,11 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          flexShrink: 0
+          flexShrink: 0,
+          width: { xs: 120, sm: 140 },
+          height: { xs: 120, sm: 140 },
+          minWidth: { xs: 120, sm: 140 },
+          minHeight: { xs: 120, sm: 140 }
         }}>
           <CircularProgress
             variant="determinate"
@@ -169,8 +172,8 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
             sx={{
               color: alpha(theme.palette.grey[200], 0.4),
               position: 'absolute',
-              width: { xs: 100, sm: 120 },
-              height: { xs: 100, sm: 120 }
+              width: '100%',
+              height: '100%'
             }}
           />
           <CircularProgress
@@ -181,8 +184,8 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
             sx={{
               color: scoreColor,
               position: 'absolute',
-              width: { xs: 100, sm: 120 },
-              height: { xs: 100, sm: 120 },
+              width: '100%',
+              height: '100%',
               filter: `drop-shadow(0 0 16px ${alpha(scoreColor, 0.4)})`
             }}
           />
@@ -191,17 +194,22 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            top: 0,
+            left: 0
           }}>
             <Typography
               variant="h2"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+                fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.2rem' },
                 color: scoreColor,
                 lineHeight: 1,
                 textShadow: `0 3px 12px ${alpha(scoreColor, 0.5)}`,
-                mb: 0.5
+                mb: 0.5,
+                textAlign: 'center'
               }}
             >
               {healthData.score}
@@ -210,10 +218,11 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
               variant="body2"
               sx={{
                 color: theme.palette.text.secondary,
-                fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                fontSize: { xs: '0.75rem', sm: '0.85rem' },
                 fontWeight: 600,
                 textTransform: 'uppercase',
-                letterSpacing: '1px'
+                letterSpacing: '1px',
+                textAlign: 'center'
               }}
             >
               Health Score
@@ -396,200 +405,6 @@ const FinancialHealthScore: React.FC<FinancialHealthScoreProps> = ({ score }) =>
         </Box>
       </Box>
 
-      {/* Actionable Recommendations */}
-      <Box sx={{
-        p: { xs: 3, sm: 4 },
-        borderRadius: 4,
-        background: `linear-gradient(135deg, ${alpha(scoreColor, 0.12)} 0%, ${alpha(scoreColor, 0.06)} 100%)`,
-        border: `2px solid ${alpha(scoreColor, 0.25)}`,
-        boxShadow: `0 8px 32px ${alpha(scoreColor, 0.2)}`
-      }}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          mb: 3
-        }}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 800,
-              color: scoreColor,
-              fontSize: { xs: '1.1rem', sm: '1.25rem' }
-            }}
-          >
-            💡 Next Steps
-          </Typography>
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-          {healthData.score >= 80 ? (
-            <>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.success.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>🎯</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.success.main, mb: 0.5 }}>
-                    Advanced Strategy
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Consider investment planning and advanced wealth management strategies.
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.info.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>📈</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.info.main, mb: 0.5 }}>
-                    Wealth Building
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Focus on long-term wealth accumulation and passive income streams.
-                  </Typography>
-                </Box>
-              </Box>
-            </>
-          ) : healthData.score >= 60 ? (
-            <>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.warning.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>💰</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.warning.main, mb: 0.5 }}>
-                    Increase Savings Rate
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Aim for 20% or more savings rate to improve your financial health score.
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.info.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>📊</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.info.main, mb: 0.5 }}>
-                    Budget Optimization
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Review and optimize your budget categories for better spending control.
-                  </Typography>
-                </Box>
-              </Box>
-            </>
-          ) : healthData.score >= 40 ? (
-            <>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.warning.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>📝</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.warning.main, mb: 0.5 }}>
-                    Create a Budget
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Start with a detailed monthly budget to track income and expenses.
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.info.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>💸</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.info.main, mb: 0.5 }}>
-                    Emergency Fund
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Build an emergency fund covering 3-6 months of expenses.
-                  </Typography>
-                </Box>
-              </Box>
-            </>
-          ) : (
-            <>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.error.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>📊</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.error.main, mb: 0.5 }}>
-                    Track All Expenses
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Start tracking every expense to understand your spending patterns.
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 2,
-                p: 2.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.warning.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`
-              }}>
-                <Typography sx={{ fontSize: '1.2rem', mt: -0.5 }}>🎯</Typography>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.warning.main, mb: 0.5 }}>
-                    Set Financial Goals
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                    Define clear financial goals and create a plan to achieve them.
-                  </Typography>
-                </Box>
-              </Box>
-            </>
-          )}
-        </Box>
-      </Box>
     </Box>
   );
 };

@@ -1,12 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Box, 
-  Typography, 
-  useTheme,
-  FormControl,
-  Select,
-  MenuItem,
-  SelectChangeEvent
+import React, { useMemo } from 'react';
+import {
+  Box,
+  Typography,
+  useTheme
 } from '@mui/material';
 import { 
   Chart as ChartJS, 
@@ -23,7 +19,6 @@ import {
 import { Line } from 'react-chartjs-2';
 import InsightsIcon from '@mui/icons-material/Insights';
 import { useFinancial } from '../../context/FinancialContext';
-import { Transaction } from '../../context/FinancialContext';
 
 ChartJS.register(
   CategoryScale,
@@ -39,12 +34,7 @@ ChartJS.register(
 
 const SpendingChart: React.FC = () => {
   const theme = useTheme();
-  const [timeframe, setTimeframe] = useState('month');
   const { financialData } = useFinancial();
-
-  const handleTimeframeChange = (event: SelectChangeEvent) => {
-    setTimeframe(event.target.value);
-  };
 
   // Calculate chart data based on transaction data
   const chartData = useMemo(() => {
@@ -62,38 +52,21 @@ const SpendingChart: React.FC = () => {
     const dates = transactions.map(t => new Date(t.date));
     const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
     const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
-    
-    // Calculate timeframe based on actual data
-    const monthDiff = (maxDate.getMonth() - minDate.getMonth()) + 
-                     (12 * (maxDate.getFullYear() - minDate.getFullYear()));
-    
-    // Determine if we should use weeks or months based on data range
-    const useWeeks = monthDiff < 1;
-    const actualTimeframe = useWeeks ? 'week' : 'month';
-    
+
     // Group transactions by time period
     const incomeByPeriod: Record<string, number> = {};
     const expensesByPeriod: Record<string, number> = {};
     
     transactions.forEach(transaction => {
       const date = new Date(transaction.date);
-      let periodKey: string;
-      
-      if (actualTimeframe === 'week') {
-        // Get ISO week number
-        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-        const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-        const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-        periodKey = `${date.getFullYear()}-W${weekNum}`;
-      } else {
-        // Month format: YYYY-MM
-        periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-      }
-      
+
+      // Month format: YYYY-MM
+      const periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+
       // Initialize if needed
       if (!incomeByPeriod[periodKey]) incomeByPeriod[periodKey] = 0;
       if (!expensesByPeriod[periodKey]) expensesByPeriod[periodKey] = 0;
-      
+
       // Add amount to appropriate category
       if (transaction.type === 'income') {
         incomeByPeriod[periodKey] += transaction.amount;
@@ -102,40 +75,20 @@ const SpendingChart: React.FC = () => {
       }
     });
     
-    // Generate all period keys in range
+    // Generate all period keys in range (monthly)
     const allPeriodKeys: string[] = [];
-    if (actualTimeframe === 'week') {
-      // Generate all weeks in range
-      const startDate = new Date(minDate);
-      const endDate = new Date(maxDate);
-      while (startDate <= endDate) {
-        const firstDayOfYear = new Date(startDate.getFullYear(), 0, 1);
-        const pastDaysOfYear = (startDate.getTime() - firstDayOfYear.getTime()) / 86400000;
-        const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-        const periodKey = `${startDate.getFullYear()}-W${weekNum}`;
-        
-        if (!allPeriodKeys.includes(periodKey)) {
-          allPeriodKeys.push(periodKey);
-        }
-        
-        // Move to next week
-        startDate.setDate(startDate.getDate() + 7);
-      }
-    } else {
-      // Generate all months in range
-      const startYear = minDate.getFullYear();
-      const startMonth = minDate.getMonth();
-      const endYear = maxDate.getFullYear();
-      const endMonth = maxDate.getMonth();
-      
-      for (let year = startYear; year <= endYear; year++) {
-        const monthStart = (year === startYear) ? startMonth : 0;
-        const monthEnd = (year === endYear) ? endMonth : 11;
-        
-        for (let month = monthStart; month <= monthEnd; month++) {
-          const periodKey = `${year}-${(month + 1).toString().padStart(2, '0')}`;
-          allPeriodKeys.push(periodKey);
-        }
+    const startYear = minDate.getFullYear();
+    const startMonth = minDate.getMonth();
+    const endYear = maxDate.getFullYear();
+    const endMonth = maxDate.getMonth();
+
+    for (let year = startYear; year <= endYear; year++) {
+      const monthStart = (year === startYear) ? startMonth : 0;
+      const monthEnd = (year === endYear) ? endMonth : 11;
+
+      for (let month = monthStart; month <= monthEnd; month++) {
+        const periodKey = `${year}-${(month + 1).toString().padStart(2, '0')}`;
+        allPeriodKeys.push(periodKey);
       }
     }
     
@@ -144,14 +97,9 @@ const SpendingChart: React.FC = () => {
     
     // Create formatted labels and data arrays
     const labels = allPeriodKeys.map(key => {
-      if (actualTimeframe === 'week') {
-        const [year, week] = key.split('-W');
-        return `Week ${week}`;
-      } else {
-        const [year, month] = key.split('-');
-        return new Date(parseInt(year), parseInt(month) - 1, 1)
-          .toLocaleString('default', { month: 'short', year: '2-digit' });
-      }
+      const [year, month] = key.split('-');
+      return new Date(parseInt(year), parseInt(month) - 1, 1)
+        .toLocaleString('default', { month: 'short', year: '2-digit' });
     });
     
     const incomeData = allPeriodKeys.map(key => incomeByPeriod[key] || 0);
@@ -268,20 +216,6 @@ const SpendingChart: React.FC = () => {
             Income vs. Expenses
           </Typography>
         </Box>
-        
-        {hasData && (
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <Select
-              value={timeframe}
-              onChange={handleTimeframeChange}
-              displayEmpty
-              inputProps={{ 'aria-label': 'Select timeframe' }}
-            >
-              <MenuItem value="week">Weekly</MenuItem>
-              <MenuItem value="month">Monthly</MenuItem>
-            </Select>
-          </FormControl>
-        )}
       </Box>
       
       <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -99,6 +99,8 @@ const initialFinancialData: FinancialData = {
     { category: 'Entertainment', budget: 200, spent: 0 },
     { category: 'Shopping', budget: 300, spent: 0 },
     { category: 'Utilities', budget: 200, spent: 0 },
+    { category: 'Healthcare', budget: 150, spent: 0 },
+    { category: 'Education', budget: 100, spent: 0 },
   ],
   goals: [],
   income: {

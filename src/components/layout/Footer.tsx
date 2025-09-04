@@ -2,7 +2,11 @@ import React from 'react';
 import { Box, Container, Typography, Link, Divider, useTheme, alpha } from '@mui/material';
 import SecurityIcon from '@mui/icons-material/Security';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigate?: (page: string) => void;
+}
+
+const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const theme = useTheme();
 
   return (
@@ -17,72 +21,62 @@ const Footer: React.FC = () => {
     >
       <Divider sx={{ mb: 4, opacity: 0.5 }} />
       <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'center', sm: 'flex-start' },
-            gap: 3,
-          }}
-        >
-          <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', sm: 'flex-start' }, mb: 1 }}>
-              <SecurityIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: 20 }} />
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}
-              >
-                Smart Financial Coach
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 350 }}>
-              Take control of your finances with AI-powered insights. Your data stays on your device.
+        <Box sx={{ textAlign: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+            <SecurityIcon sx={{ color: theme.palette.primary.main, mr: 1, fontSize: 20 }} />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}
+            >
+              Smart Financial Coach
             </Typography>
-            <Box sx={{ mt: 2, display: 'flex', gap: 2, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
-              <Link href="#" underline="none" sx={{ color: theme.palette.primary.main }}>
-                Privacy
-              </Link>
-              <Link href="#" underline="none" sx={{ color: theme.palette.primary.main }}>
-                Terms
-              </Link>
-              <Link href="#" underline="none" sx={{ color: theme.palette.primary.main }}>
-                About
-              </Link>
-            </Box>
           </Box>
-          
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: { xs: 3, sm: 5 },
-              textAlign: { xs: 'center', sm: 'left' },
-            }}
-          >
-            <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, color: theme.palette.text.primary }}>
-                Features
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Link href="#" color="text.secondary" underline="hover">Dashboard</Link>
-                <Link href="#" color="text.secondary" underline="hover">Insights</Link>
-                <Link href="#" color="text.secondary" underline="hover">Budget</Link>
-                <Link href="#" color="text.secondary" underline="hover">Goals</Link>
-              </Box>
-            </Box>
-            
-            <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, color: theme.palette.text.primary }}>
-                Resources
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Link href="#" color="text.secondary" underline="hover">Help Center</Link>
-                <Link href="#" color="text.secondary" underline="hover">Financial Tips</Link>
-                <Link href="#" color="text.secondary" underline="hover">Blog</Link>
-                <Link href="#" color="text.secondary" underline="hover">Contact Us</Link>
-              </Box>
-            </Box>
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 2 }}>
+            Take control of your finances with AI-powered insights. Your data stays on your device.
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+            <Link
+              component="button"
+              onClick={() => onNavigate?.('privacy')}
+              underline="none"
+              sx={{
+                color: theme.palette.primary.main,
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              Privacy
+            </Link>
+            <Link
+              component="button"
+              onClick={() => onNavigate?.('terms')}
+              underline="none"
+              sx={{
+                color: theme.palette.primary.main,
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              Terms
+            </Link>
+            <Link
+              component="button"
+              onClick={() => onNavigate?.('about')}
+              underline="none"
+              sx={{
+                color: theme.palette.primary.main,
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              About
+            </Link>
           </Box>
         </Box>
         

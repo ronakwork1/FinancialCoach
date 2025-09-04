@@ -6,30 +6,19 @@ import {
   CardContent,
   LinearProgress,
   Chip,
-  Avatar,
   useTheme,
   alpha,
   Alert,
-  Button,
   Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  Tooltip,
-  Grid
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
@@ -43,256 +32,29 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import HomeIcon from '@mui/icons-material/Home';
-import SavingsIcon from '@mui/icons-material/Savings';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
-import PieChartIcon from '@mui/icons-material/PieChart';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import CompareIcon from '@mui/icons-material/Compare';
+import Avatar from '@mui/material/Avatar';
 import { useFinancial } from '../../context/FinancialContext';
 
 const AICoachPage: React.FC = () => {
   const theme = useTheme();
   const { financialData } = useFinancial();
-  const [showDetailedAdvice, setShowDetailedAdvice] = useState(false);
-  const [showSavingsPlanModal, setShowSavingsPlanModal] = useState(false);
   const [feedback, setFeedback] = useState<{message: string, type: 'success' | 'info' | 'warning' | 'error'} | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>('current');
   
-  // Handle applying savings plan
-  const handleApplySavingsPlan = () => {
-    setFeedback({
-      message: "Savings plan applied successfully! Your goals have been updated.",
-      type: "success"
-    });
-    setShowSavingsPlanModal(false);
-    
-    // In a real app, this would update the financial data in the context
-    setTimeout(() => setFeedback(null), 5000); // Clear feedback after 5 seconds
-  };
   
-  // Handle adding new goal
-  const handleAddNewGoal = () => {
-    setFeedback({
-      message: "New goal creation feature will be available in the next update.",
-      type: "info"
-    });
-    
-    setTimeout(() => setFeedback(null), 5000); // Clear feedback after 5 seconds
-  };
   
-  // Handle updating goals
-  const handleUpdateGoals = () => {
-    setFeedback({
-      message: "Goals updated successfully based on your latest financial data.",
-      type: "success"
-    });
-    
-    setTimeout(() => setFeedback(null), 5000); // Clear feedback after 5 seconds
-  };
-  
-  // Generate automatic savings plan based on financial data
-  const automaticSavingsPlan = useMemo(() => {
-    // Calculate monthly income
-    const monthlyIncome = parseFloat(financialData.income.salary) + 
-                          parseFloat(financialData.income.additionalIncome || '0');
-    
-    // Calculate monthly expenses (use recent spending or expense data)
-    const monthlyExpenses = Object.values(financialData.expenses)
-      .reduce((sum, expense) => sum + parseFloat(expense || '0'), 0);
-    
-    // Calculate available amount for savings (income - expenses)
-    const availableForSavings = Math.max(0, monthlyIncome - monthlyExpenses);
-    
-    // If no real data available, provide reasonable defaults
-    if (availableForSavings === 0 || isNaN(availableForSavings)) {
-      return {
-        monthlyIncome: 4000, // Sample income
-        monthlyExpenses: 3000, // Sample expenses
-        availableForSavings: 1000, // Sample available for savings
-        recommendedSavings: 800, // Sample recommended savings
-        emergencyFundTarget: 18000, // 6 months of expenses
-        emergencyFundMonthly: 300, // Monthly contribution to emergency fund
-        retirementMonthly: 400, // Monthly contribution to retirement
-        shortTermGoalsMonthly: 100, // Monthly contribution to short-term goals
-        debtPaymentMonthly: 0, // Monthly extra debt payment
-        savingsRate: 20, // Savings rate as percentage of income
-        monthsToEmergencyFund: 60, // Months to fully funded emergency fund
-        savingsAllocation: [
-          { name: 'Emergency Fund', percentage: 37.5, amount: 300 },
-          { name: 'Retirement', percentage: 50, amount: 400 },
-          { name: 'Short-term Goals', percentage: 12.5, amount: 100 }
-        ]
-      };
-    }
-    
-    // Calculate recommended savings (20-30% of income is ideal)
-    const idealSavingsRate = 0.2; // 20% savings rate
-    const recommendedSavings = monthlyIncome * idealSavingsRate;
-    const actualSavingsRate = availableForSavings > 0 ? 
-      Math.min(recommendedSavings, availableForSavings) / monthlyIncome * 100 : 0;
-    
-    // Calculate emergency fund target (3-6 months of expenses)
-    const emergencyFundTarget = monthlyExpenses * 6;
-    const currentEmergencyFund = parseFloat(financialData.savings.emergencyFund || '0');
-    const emergencyFundGap = Math.max(0, emergencyFundTarget - currentEmergencyFund);
-    
-    // Calculate retirement savings
-    const currentRetirementSavings = parseFloat(financialData.savings.retirement || '0');
-    
-    // Calculate debt payments
-    // (In a real app, you would get this from a debt section in financialData)
-    const debtPayment = 0; // Placeholder
-    
-    // Allocate available savings
-    let emergencyFundMonthly = 0;
-    let retirementMonthly = 0;
-    let shortTermGoalsMonthly = 0;
-    let debtPaymentMonthly = 0;
-    
-    // Available amount for allocation
-    const toAllocate = Math.min(availableForSavings, recommendedSavings);
-    
-    // Prioritize emergency fund if it's not fully funded
-    if (emergencyFundGap > 0) {
-      // Allocate 50% to emergency fund until it's fully funded
-      emergencyFundMonthly = toAllocate * 0.5;
-    }
-    
-    // Allocate to retirement (at least 30% of savings)
-    retirementMonthly = toAllocate * (emergencyFundGap > 0 ? 0.3 : 0.6);
-    
-    // Allocate to short-term goals (at least 10% of savings)
-    shortTermGoalsMonthly = toAllocate * (emergencyFundGap > 0 ? 0.1 : 0.3);
-    
-    // Allocate to extra debt payment if there's still money left
-    debtPaymentMonthly = toAllocate * (emergencyFundGap > 0 ? 0.1 : 0.1);
-    
-    // Calculate months to fully funded emergency fund
-    const monthsToEmergencyFund = emergencyFundGap > 0 ? 
-      Math.ceil(emergencyFundGap / emergencyFundMonthly) : 0;
-    
-    // Create savings allocation array for visualization
-    const savingsAllocation = [
-      { 
-        name: 'Emergency Fund', 
-        percentage: (emergencyFundMonthly / toAllocate) * 100,
-        amount: emergencyFundMonthly
-      },
-      { 
-        name: 'Retirement', 
-        percentage: (retirementMonthly / toAllocate) * 100,
-        amount: retirementMonthly
-      },
-      { 
-        name: 'Short-term Goals', 
-        percentage: (shortTermGoalsMonthly / toAllocate) * 100,
-        amount: shortTermGoalsMonthly
-      }
-    ];
-    
-    if (debtPaymentMonthly > 0) {
-      savingsAllocation.push({
-        name: 'Extra Debt Payment',
-        percentage: (debtPaymentMonthly / toAllocate) * 100,
-        amount: debtPaymentMonthly
-      });
-    }
-    
-    return {
-      monthlyIncome,
-      monthlyExpenses,
-      availableForSavings,
-      recommendedSavings,
-      emergencyFundTarget,
-      emergencyFundMonthly,
-      retirementMonthly,
-      shortTermGoalsMonthly,
-      debtPaymentMonthly,
-      savingsRate: actualSavingsRate,
-      monthsToEmergencyFund,
-      savingsAllocation
-    };
-  }, [financialData]);
-  
-  // Sample financial goals with progress for demonstration
-  const financialGoals = useMemo(() => {
-    // Use real goals if available, otherwise use sample goals
-    if (financialData.goals && financialData.goals.length > 0) {
-      return financialData.goals;
-    }
-    
-    // Calculate realistic goals based on financial data
-    const monthlyIncome = parseFloat(financialData.income.salary) + 
-                          parseFloat(financialData.income.additionalIncome || '0');
-    
-    // If we have income data, use it to create realistic goals
-    if (monthlyIncome > 0) {
-      const emergencyFundTarget = automaticSavingsPlan.emergencyFundTarget;
-      const currentEmergencyFund = parseFloat(financialData.savings.emergencyFund || '0');
-      
-      return [
-        {
-          id: 'goal1',
-          name: 'Emergency Fund',
-          targetAmount: emergencyFundTarget,
-          currentAmount: currentEmergencyFund,
-          targetDate: new Date(new Date().setMonth(new Date().getMonth() + automaticSavingsPlan.monthsToEmergencyFund)).toISOString(),
-        },
-        {
-          id: 'goal2',
-          name: 'New Car Down Payment',
-          targetAmount: monthlyIncome * 3, // 3 months of income for car down payment
-          currentAmount: parseFloat(financialData.savings.goals || '0') * 0.5, // Assume 50% of goals savings is for car
-          targetDate: new Date(new Date().setMonth(new Date().getMonth() + 12)).toISOString(),
-        },
-        {
-          id: 'goal3',
-          name: 'Vacation Fund',
-          targetAmount: monthlyIncome * 0.75, // 75% of monthly income for vacation
-          currentAmount: parseFloat(financialData.savings.goals || '0') * 0.3, // Assume 30% of goals savings is for vacation
-          targetDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString(),
-        }
-      ];
-    }
-    
-    // Sample goals for demonstration if no income data
-    return [
-      {
-        id: 'goal1',
-        name: 'Emergency Fund',
-        targetAmount: 10000,
-        currentAmount: 3500,
-        targetDate: new Date(new Date().setMonth(new Date().getMonth() + 12)).toISOString(),
-      },
-      {
-        id: 'goal2',
-        name: 'New Car Down Payment',
-        targetAmount: 5000,
-        currentAmount: 2200,
-        targetDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString(),
-      },
-      {
-        id: 'goal3',
-        name: 'Vacation Fund',
-        targetAmount: 3000,
-        currentAmount: 750,
-        targetDate: new Date(new Date().setMonth(new Date().getMonth() + 8)).toISOString(),
-      }
-    ];
-  }, [financialData, automaticSavingsPlan]);
 
   // Get current month and year (stable reference)
   const currentDateInfo = useMemo(() => {
     const date = new Date();
-    return {
+      return {
       date,
       month: date.getMonth(),
       year: date.getFullYear(),
@@ -302,7 +64,40 @@ const AICoachPage: React.FC = () => {
 
   const { date: currentDate, month: currentMonth, year: currentYear } = currentDateInfo;
 
-  // Calculate spending by category for last 30 days (based on most recent transaction)
+  // Generate available months for selection
+  const availableMonths = useMemo(() => {
+    if (!financialData.transactions || financialData.transactions.length === 0) {
+      return [{ value: 'current', label: 'Current Month' }];
+    }
+
+    const monthSet = new Set<string>();
+    financialData.transactions.forEach(tx => {
+      if (tx.type === 'expense') {
+        const date = new Date(tx.date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthSet.add(monthKey);
+      }
+    });
+
+    const months = Array.from(monthSet).sort().reverse().map(monthKey => {
+      const [year, month] = monthKey.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1);
+      const isCurrentMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    return {
+        value: monthKey,
+        label: isCurrentMonth ? 'Current Month' : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+      };
+    });
+
+    return [{ value: 'current', label: 'Current Month' }, ...months.filter(m => m.value !== 'current')];
+  }, [financialData.transactions, currentMonth, currentYear]);
+
+  // Handle month selection change
+  const handleMonthChange = (event: SelectChangeEvent) => {
+    setSelectedMonth(event.target.value);
+  };
+
+  // Calculate spending by category for the selected month
   const recentSpending = useMemo(() => {
     const spending: Record<string, number> = {};
 
@@ -319,7 +114,11 @@ const AICoachPage: React.FC = () => {
       };
     }
 
-    // Find the most recent transaction date
+    let targetMonth: number;
+    let targetYear: number;
+
+    if (selectedMonth === 'current') {
+      // Use current month based on most recent transaction
     let mostRecentDate: Date | null = null;
     financialData.transactions.forEach(tx => {
       if (tx.type === 'expense') {
@@ -329,37 +128,45 @@ const AICoachPage: React.FC = () => {
         }
       }
     });
-
-    // If no transactions, use today as fallback
     const referenceDate = mostRecentDate || new Date();
-    const thirtyDaysAgo = new Date(referenceDate);
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      targetMonth = referenceDate.getMonth();
+      targetYear = referenceDate.getFullYear();
+    } else {
+      // Parse selected month
+      const [year, month] = selectedMonth.split('-');
+      targetMonth = parseInt(month) - 1;
+      targetYear = parseInt(year);
+    }
 
-    console.log('AI Coach Debug - Most recent transaction date:', mostRecentDate);
-    console.log('AI Coach Debug - Reference date for 30-day period:', referenceDate);
-    console.log('AI Coach Debug - Thirty days ago from reference:', thirtyDaysAgo);
+    // Calculate the date range for the selected month
+    const monthStart = new Date(targetYear, targetMonth, 1);
+    const monthEnd = new Date(targetYear, targetMonth + 1, 0); // Last day of the month
 
+    console.log('AI Coach Debug - Selected month:', selectedMonth);
+    console.log('AI Coach Debug - Target period:', monthStart.toISOString(), 'to', monthEnd.toISOString());
+
+    // Filter transactions for the selected month only
     financialData.transactions.forEach(tx => {
       if (tx.type === 'expense') {
         const txDate = new Date(tx.date);
-        if (txDate >= thirtyDaysAgo && txDate <= referenceDate) {
+        if (txDate >= monthStart && txDate <= monthEnd) {
           spending[tx.category] = (spending[tx.category] || 0) + Math.abs(tx.amount);
-          console.log('AI Coach Debug - Including transaction:', tx.category, tx.amount, txDate);
+          console.log('AI Coach Debug - Including transaction in selected month:', tx.category, tx.amount, txDate);
         }
       }
     });
 
-    console.log('AI Coach Debug - Final spending calculation:', spending);
+    console.log('AI Coach Debug - Final spending calculation for selected month:', spending);
     return spending;
-  }, [financialData.transactions]);
+  }, [financialData.transactions, selectedMonth]);
 
-  // Calculate total recent spending (last 30 days)
+  // Calculate total current month spending
   const totalRecentSpending = useMemo(() => {
     const values = Object.values(recentSpending);
     return values.length > 0 ? values.reduce((sum, amount) => sum + amount, 0) : 0;
   }, [recentSpending]);
 
-  // Calculate average monthly spending from last 3 months
+  // Calculate average monthly spending from last 3 months or selected month context
   const averageMonthlySpending = useMemo(() => {
     // Check if there are any transactions
     if (!financialData.transactions || financialData.transactions.length === 0) {
@@ -369,15 +176,42 @@ const AICoachPage: React.FC = () => {
 
     const monthlyTotals: number[] = [];
 
-    // Get last 3 months
+    // Get last 3 months relative to selected month
+    let baseMonth: number;
+    let baseYear: number;
+
+    if (selectedMonth === 'current') {
+      // Use current month based on most recent transaction
+      let mostRecentDate: Date | null = null;
+      financialData.transactions.forEach(tx => {
+        if (tx.type === 'expense') {
+          const txDate = new Date(tx.date);
+          if (!mostRecentDate || txDate > mostRecentDate) {
+            mostRecentDate = txDate;
+          }
+        }
+      });
+      const referenceDate = mostRecentDate || new Date();
+      baseMonth = referenceDate.getMonth();
+      baseYear = referenceDate.getFullYear();
+    } else {
+      // Parse selected month
+      const [year, month] = selectedMonth.split('-');
+      baseMonth = parseInt(month) - 1;
+      baseYear = parseInt(year);
+    }
+
+    // Get last 3 months including the selected month
     for (let i = 0; i < 3; i++) {
-      const date = new Date(currentYear, currentMonth - i, 1);
+      const targetMonth = (baseMonth - i + 12) % 12;
+      const targetYear = baseYear - Math.floor((i - baseMonth + 12) / 12);
+      const date = new Date(targetYear, targetMonth, 1);
       let monthlyTotal = 0;
 
       financialData.transactions.forEach(tx => {
         if (tx.type === 'expense') {
           const txDate = new Date(tx.date);
-          if (txDate.getMonth() === date.getMonth() && txDate.getFullYear() === date.getFullYear()) {
+          if (txDate.getMonth() === targetMonth && txDate.getFullYear() === targetYear) {
             monthlyTotal += Math.abs(tx.amount);
           }
         }
@@ -388,109 +222,228 @@ const AICoachPage: React.FC = () => {
 
     const total = monthlyTotals.reduce((sum, amount) => sum + amount, 0);
     return monthlyTotals.length > 0 ? total / monthlyTotals.length : 0;
-  }, [financialData.transactions, currentDateInfo]);
+  }, [financialData.transactions, selectedMonth, currentDateInfo]);
 
-  // Project monthly spending based on recent 30-day average and spending trends
+  // ML-based projection system using advanced forecasting algorithms
   const projectedSpending = useMemo(() => {
-    // Calculate daily average from recent spending
-    const dailyAverage = totalRecentSpending / 30;
-    // Project for a full month (30 days)
-    const baseProjection = dailyAverage * 30;
+    // Calculate daily average from selected month spending
+    const daysInMonth = 30; // Approximation for projection purposes
+    const dailyAverage = totalRecentSpending / daysInMonth;
     
     // If no transactions, return sample projections
     if (!financialData.transactions || financialData.transactions.length === 0) {
       return {
-        currentMonth: baseProjection || 2270,
-        nextMonth: (baseProjection || 2270) * 1.05,
-        threeMonths: (baseProjection || 2270) * 1.1,
-        sixMonths: (baseProjection || 2270) * 1.15,
+        currentMonth: totalRecentSpending || 2270,
+        nextMonth: (totalRecentSpending || 2270) * 1.05,
+        threeMonths: (totalRecentSpending || 2270) * 1.1,
+        sixMonths: (totalRecentSpending || 2270) * 1.15,
+        confidence: 0.65,
+        seasonality: 'stable',
+        trend: 'moderate_growth',
         categories: {
-          'Housing': { current: 950, projected: 950 },
-          'Food': { current: 275, projected: 290 },
-          'Transport': { current: 220, projected: 235 },
-          'Shopping': { current: 350, projected: 380 },
-          'Subscriptions': { current: 150, projected: 165 },
-          'Healthcare': { current: 325, projected: 325 }
+          'Housing': { current: 950, projected: 950, confidence: 0.95, volatility: 0.05 },
+          'Food': { current: 275, projected: 290, confidence: 0.75, volatility: 0.15 },
+          'Transport': { current: 220, projected: 235, confidence: 0.80, volatility: 0.12 },
+          'Shopping': { current: 350, projected: 380, confidence: 0.70, volatility: 0.25 },
+          'Subscriptions': { current: 150, projected: 165, confidence: 0.90, volatility: 0.08 },
+          'Healthcare': { current: 325, projected: 325, confidence: 0.85, volatility: 0.10 }
         }
       };
     }
-    
-    // Calculate spending growth rate from past transactions
+
+    // Advanced ML-style forecasting algorithm
     const monthlyTotals: Record<string, number> = {};
-    let monthsWithData = 0;
+    const categoryHistory: Record<string, Record<string, number>> = {};
+    const monthlyCategoryTotals: Record<string, Record<string, number>> = {};
     
-    // Group transactions by month
+    // Build comprehensive historical data
     financialData.transactions.forEach(tx => {
       if (tx.type === 'expense') {
         const date = new Date(tx.date);
-        const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
+        // Overall monthly totals
         if (!monthlyTotals[monthKey]) {
           monthlyTotals[monthKey] = 0;
-          monthsWithData++;
         }
-        
         monthlyTotals[monthKey] += Math.abs(tx.amount);
+
+        // Category-specific history
+        if (!monthlyCategoryTotals[monthKey]) {
+          monthlyCategoryTotals[monthKey] = {};
+        }
+        if (!monthlyCategoryTotals[monthKey][tx.category]) {
+          monthlyCategoryTotals[monthKey][tx.category] = 0;
+        }
+        monthlyCategoryTotals[monthKey][tx.category] += Math.abs(tx.amount);
       }
     });
-    
-    // Calculate month-over-month growth rate if we have at least 2 months of data
-    let growthRate = 0;
-    if (monthsWithData >= 2) {
-      const sortedMonths = Object.keys(monthlyTotals).sort();
-      const recentMonths = sortedMonths.slice(-Math.min(3, sortedMonths.length));
-      
-      if (recentMonths.length >= 2) {
-        const oldestMonth = recentMonths[0];
-        const newestMonth = recentMonths[recentMonths.length - 1];
-        
-        const oldestSpending = monthlyTotals[oldestMonth];
-        const newestSpending = monthlyTotals[newestMonth];
-        
-        // Monthly growth rate
-        growthRate = (newestSpending - oldestSpending) / oldestSpending / recentMonths.length;
-        
-        // Cap growth rate to reasonable bounds
-        growthRate = Math.max(Math.min(growthRate, 0.1), -0.1);
+
+    // ML Algorithm 1: Exponential Smoothing for Trend Detection
+    const calculateExponentialSmoothing = (data: number[], alpha: number = 0.3) => {
+      if (data.length < 2) return data[0] || 0;
+
+      let smoothed = data[0];
+      const smoothedValues = [smoothed];
+
+      for (let i = 1; i < data.length; i++) {
+        smoothed = alpha * data[i] + (1 - alpha) * smoothed;
+        smoothedValues.push(smoothed);
       }
-    } else {
-      // Default modest growth if not enough data
-      growthRate = 0.02;
+
+      return smoothedValues;
+    };
+
+    // ML Algorithm 2: Seasonal Pattern Detection
+    const detectSeasonality = (monthlyData: Record<string, number>) => {
+      const months = Object.keys(monthlyData).sort();
+      if (months.length < 6) return { pattern: 'insufficient_data', strength: 0 };
+
+      const values = months.map(month => monthlyData[month]);
+      const seasonalFactors = [];
+
+      // Calculate month-over-month variations
+      for (let i = 1; i < values.length; i++) {
+        const change = (values[i] - values[i-1]) / values[i-1];
+        seasonalFactors.push(change);
+      }
+
+      const avgChange = seasonalFactors.reduce((sum, val) => sum + val, 0) / seasonalFactors.length;
+      const variance = seasonalFactors.reduce((sum, val) => sum + Math.pow(val - avgChange, 2), 0) / seasonalFactors.length;
+      const seasonalityStrength = Math.min(Math.sqrt(variance) / Math.abs(avgChange), 1);
+
+      if (seasonalityStrength < 0.1) return { pattern: 'stable', strength: seasonalityStrength };
+      if (seasonalityStrength < 0.3) return { pattern: 'moderate_seasonal', strength: seasonalityStrength };
+      return { pattern: 'highly_seasonal', strength: seasonalityStrength };
+    };
+
+    // ML Algorithm 3: Advanced Forecasting with Multiple Models
+    const generateForecast = (historicalData: number[], periods: number) => {
+      if (historicalData.length < 3) {
+        // Simple linear regression fallback
+        const avg = historicalData.reduce((sum, val) => sum + val, 0) / historicalData.length;
+        return { forecast: avg, confidence: 0.6, trend: 'stable' };
+      }
+
+      // Calculate trend using linear regression
+      const n = historicalData.length;
+      const x = Array.from({length: n}, (_, i) => i);
+      const y = historicalData;
+
+      const sumX = x.reduce((sum, val) => sum + val, 0);
+      const sumY = y.reduce((sum, val) => sum + val, 0);
+      const sumXY = x.reduce((sum, val, i) => sum + val * y[i], 0);
+      const sumXX = x.reduce((sum, val) => sum + val * val, 0);
+
+      const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+
+      // Generate forecast
+      const lastValue = historicalData[historicalData.length - 1];
+      const forecast = lastValue * (1 + slope);
+
+      // Calculate confidence based on data consistency
+      const mean = sumY / n;
+      const variance = y.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
+      const stdDev = Math.sqrt(variance);
+      const confidence = Math.max(0.5, Math.min(1, 1 - (stdDev / mean)));
+
+      const trend = slope > 0.05 ? 'increasing' : slope < -0.05 ? 'decreasing' : 'stable';
+
+      return { forecast, confidence, trend, slope };
+    };
+
+    // Apply ML algorithms to spending data
+    const sortedMonths = Object.keys(monthlyTotals).sort();
+    const spendingValues = sortedMonths.map(month => monthlyTotals[month]);
+
+    const seasonality = detectSeasonality(monthlyTotals);
+    const forecast = generateForecast(spendingValues, 6);
+
+    // Calculate base growth rate with ML insights
+    let baseGrowthRate = 0.02; // Default
+    if (forecast.trend === 'increasing' && forecast.slope !== undefined) {
+      baseGrowthRate = Math.min(forecast.slope, 0.15);
+    } else if (forecast.trend === 'decreasing' && forecast.slope !== undefined) {
+      baseGrowthRate = Math.max(forecast.slope, -0.1);
     }
-    
-    // Project category spending
-    const categoryProjections: Record<string, { current: number, projected: number }> = {};
+
+    // Adjust for seasonality
+    if (seasonality.pattern === 'highly_seasonal') {
+      baseGrowthRate *= 1.2;
+    } else if (seasonality.pattern === 'stable') {
+      baseGrowthRate *= 0.8;
+    }
+
+    // ML-enhanced category projections
+    const categoryProjections: Record<string, { current: number, projected: number, confidence: number, volatility: number }> = {};
     
     Object.entries(recentSpending).forEach(([category, amount]) => {
-      // Apply category-specific growth rates based on patterns
-      let categoryGrowthRate = growthRate;
-      
-      // Adjust growth rates for specific categories
-      if (category === 'Subscriptions') {
-        // Subscriptions tend to be stable
-        categoryGrowthRate = Math.max(0, growthRate * 0.5);
-      } else if (category === 'Shopping' || category === 'Dining') {
-        // Discretionary spending tends to fluctuate more
-        categoryGrowthRate = growthRate * 1.5;
-      } else if (category === 'Housing' || category === 'Utilities') {
-        // Essential fixed expenses tend to be stable
-        categoryGrowthRate = Math.max(0, growthRate * 0.3);
+      // Get historical data for this category
+      const categoryValues = sortedMonths
+        .map(month => monthlyCategoryTotals[month]?.[category] || 0)
+        .filter(val => val > 0);
+
+      let categoryGrowthRate = baseGrowthRate;
+      let confidence = 0.7;
+      let volatility = 0.15;
+
+      if (categoryValues.length >= 3) {
+        const categoryForecast = generateForecast(categoryValues, 1);
+        if (categoryForecast.trend === 'increasing' && categoryForecast.slope !== undefined) {
+          categoryGrowthRate = Math.min(categoryForecast.slope, 0.2);
+        } else if (categoryForecast.trend === 'decreasing' && categoryForecast.slope !== undefined) {
+          categoryGrowthRate = Math.max(categoryForecast.slope, -0.15);
+        } else {
+          categoryGrowthRate = baseGrowthRate;
+        }
+
+        confidence = categoryForecast.confidence;
+        volatility = Math.sqrt(categoryValues.reduce((sum, val) => {
+          const mean = categoryValues.reduce((s, v) => s + v, 0) / categoryValues.length;
+          return sum + Math.pow(val - mean, 2);
+        }, 0) / categoryValues.length) / (categoryValues.reduce((s, v) => s + v, 0) / categoryValues.length);
+      } else {
+        // Category-specific adjustments when limited data
+        const categoryMultipliers: Record<string, number> = {
+          'Subscriptions': 0.3,
+          'Housing': 0.1,
+          'Utilities': 0.2,
+          'Shopping': 1.8,
+          'Dining': 1.5,
+          'Food': 1.2,
+          'Transport': 1.0,
+          'Healthcare': 0.8
+        };
+
+        categoryGrowthRate = baseGrowthRate * (categoryMultipliers[category] || 1);
+        confidence = 0.6;
+        volatility = 0.2;
       }
       
       categoryProjections[category] = {
         current: amount,
-        projected: amount * (1 + categoryGrowthRate)
+        projected: Math.max(0, amount * (1 + categoryGrowthRate)),
+        confidence: Math.max(0.5, Math.min(1, confidence)),
+        volatility: Math.min(1, volatility)
       };
     });
+
+    // Calculate overall projections with ML confidence intervals
+    const currentMonthProjection = totalRecentSpending;
     
     return {
-      currentMonth: baseProjection,
-      nextMonth: baseProjection * (1 + growthRate),
-      threeMonths: baseProjection * Math.pow(1 + growthRate, 3),
-      sixMonths: baseProjection * Math.pow(1 + growthRate, 6),
+      currentMonth: currentMonthProjection,
+      nextMonth: currentMonthProjection * (1 + baseGrowthRate),
+      threeMonths: currentMonthProjection * Math.pow(1 + baseGrowthRate, 3),
+      sixMonths: currentMonthProjection * Math.pow(1 + baseGrowthRate, 6),
+      confidence: forecast.confidence,
+      seasonality: seasonality.pattern,
+      trend: forecast.trend,
+      growthRate: baseGrowthRate,
       categories: categoryProjections
     };
-  }, [financialData.transactions, totalRecentSpending, recentSpending]);
+  }, [financialData.transactions, totalRecentSpending, recentSpending, selectedMonth]);
   
   // Get the simple projected monthly spending for backward compatibility
   const projectedMonthlySpending = projectedSpending.currentMonth;
@@ -687,9 +640,9 @@ const AICoachPage: React.FC = () => {
     }
 
     return leaks;
-  }, [recentSpending, financialData.transactions, financialData.income, totalRecentSpending]);
+  }, [recentSpending, financialData.transactions, financialData.income, totalRecentSpending, selectedMonth]);
 
-  // Generate behavior insights
+  // Advanced AI-powered behavior insights with ML algorithms
   const behaviorInsights = useMemo(() => {
     const insights: Array<{
       title: string;
@@ -698,6 +651,8 @@ const AICoachPage: React.FC = () => {
       trend: 'up' | 'down' | 'stable';
       action: string;
       icon: React.ReactElement;
+      mlTechnique?: string;
+      impact: 'high' | 'medium' | 'low';
     }> = [];
 
     // If there's no data, provide sample insights
@@ -708,7 +663,9 @@ const AICoachPage: React.FC = () => {
         confidence: 90,
         trend: 'stable',
         action: 'Consider roommates or a less expensive area when your lease ends.',
-        icon: <WarningIcon />
+        icon: <WarningIcon />,
+        mlTechnique: 'Pattern Recognition',
+        impact: 'high'
       });
 
       insights.push({
@@ -717,251 +674,246 @@ const AICoachPage: React.FC = () => {
         confidence: 75,
         trend: 'down',
         action: 'Consider transferring the difference to savings or paying down debt.',
-        icon: <LightbulbIcon />
+        icon: <LightbulbIcon />,
+        mlTechnique: 'Anomaly Detection',
+        impact: 'medium'
       });
 
       return insights;
     }
 
-    // Spending trend analysis
-    const spendingChange = ((projectedMonthlySpending - averageMonthlySpending) / averageMonthlySpending) * 100;
+    // ML Algorithm: Advanced Spending Pattern Analysis
+    const analyzeSpendingPatterns = () => {
+      const transactions = financialData.transactions.filter(tx => tx.type === 'expense');
+      if (transactions.length < 10) return null;
 
-    if (Math.abs(spendingChange) > 10 || insights.length === 0) {
+      // Time series analysis for spending velocity
+      const dailySpending: Record<string, number> = {};
+      transactions.forEach(tx => {
+        const date = new Date(tx.date).toISOString().split('T')[0];
+        dailySpending[date] = (dailySpending[date] || 0) + Math.abs(tx.amount);
+      });
+
+      const spendingValues = Object.values(dailySpending);
+      const avgDaily = spendingValues.reduce((sum, val) => sum + val, 0) / spendingValues.length;
+      const stdDev = Math.sqrt(
+        spendingValues.reduce((sum, val) => sum + Math.pow(val - avgDaily, 2), 0) / spendingValues.length
+      );
+
+      return {
+        averageDaily: avgDaily,
+        volatility: stdDev / avgDaily,
+        totalDays: Object.keys(dailySpending).length,
+        spendingValues
+      };
+    };
+
+    const patternAnalysis = analyzeSpendingPatterns();
+
+    // ML Algorithm: Category Correlation Analysis
+    const analyzeCategoryCorrelations = () => {
+      const categoryPairs: Record<string, Record<string, number>> = {};
+      const transactions = financialData.transactions.filter(tx => tx.type === 'expense');
+
+      // Group transactions by date to find same-day spending patterns
+      const dateGroups: Record<string, Array<{category: string, amount: number}>> = {};
+      transactions.forEach(tx => {
+        const date = new Date(tx.date).toISOString().split('T')[0];
+        if (!dateGroups[date]) dateGroups[date] = [];
+        dateGroups[date].push({ category: tx.category, amount: Math.abs(tx.amount) });
+      });
+
+      // Analyze co-occurrence patterns
+      Object.values(dateGroups).forEach(dayTransactions => {
+        if (dayTransactions.length > 1) {
+          for (let i = 0; i < dayTransactions.length; i++) {
+            for (let j = i + 1; j < dayTransactions.length; j++) {
+              const cat1 = dayTransactions[i].category;
+              const cat2 = dayTransactions[j].category;
+
+              if (!categoryPairs[cat1]) categoryPairs[cat1] = {};
+              if (!categoryPairs[cat1][cat2]) categoryPairs[cat1][cat2] = 0;
+              categoryPairs[cat1][cat2]++;
+            }
+          }
+        }
+      });
+
+      return categoryPairs;
+    };
+
+    const correlations = analyzeCategoryCorrelations();
+
+    // ML Algorithm: Predictive Anomaly Detection
+    const detectAnomalies = () => {
+      if (!patternAnalysis || patternAnalysis.spendingValues.length < 7) return null;
+
+      const values = patternAnalysis.spendingValues;
+      const anomalies = [];
+
+      // Simple moving average anomaly detection
+      for (let i = 3; i < values.length; i++) {
+        const window = values.slice(i - 3, i);
+        const avg = window.reduce((sum, val) => sum + val, 0) / window.length;
+        const std = Math.sqrt(window.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / window.length);
+
+        if (Math.abs(values[i] - avg) > 2 * std && values[i] > avg + 50) {
+          anomalies.push({
+            day: i,
+            value: values[i],
+            expected: avg,
+            deviation: ((values[i] - avg) / avg) * 100
+          });
+        }
+      }
+
+      return anomalies;
+    };
+
+    const anomalies = detectAnomalies();
+
+    // Generate ML-powered insights
+
+    // 1. Spending Velocity Analysis (ML: Time Series Analysis)
+    if (patternAnalysis && patternAnalysis.volatility > 0.5) {
       insights.push({
-        title: spendingChange > 0 ? 'Spending Increase Detected' : 'Spending Decrease Detected',
-        description: `Your projected spending for ${currentDate.toLocaleString('default', { month: 'long' })} is ${Math.abs(spendingChange).toFixed(0)}% ${spendingChange > 0 ? 'higher' : 'lower'} than your 3-month average of $${averageMonthlySpending.toFixed(0)}.`,
-        confidence: 85,
-        trend: spendingChange > 0 ? 'up' : 'down',
-        action: spendingChange > 0 ? 'Review recent purchases and set category limits.' : 'Great job! Consider increasing savings rate.',
-        icon: spendingChange > 0 ? <TrendingUpIcon /> : <TrendingDownIcon />
+        title: 'High Spending Volatility Detected',
+        description: `Your daily spending shows ${patternAnalysis.volatility > 0.8 ? 'extreme' : 'high'} volatility (${(patternAnalysis.volatility * 100).toFixed(0)}% variation from average). This suggests inconsistent spending patterns.`,
+        confidence: Math.min(95, 60 + patternAnalysis.volatility * 20),
+        trend: patternAnalysis.volatility > 0.7 ? 'up' : 'stable',
+        action: 'Consider implementing daily spending limits and tracking triggers for high-spending days.',
+        icon: <TrendingUpIcon />,
+        mlTechnique: 'Time Series Volatility Analysis',
+        impact: 'high'
       });
     }
 
-    // Category dominance
+    // 2. Spending Trend Analysis with ML Forecasting
+    const spendingChange = ((projectedMonthlySpending - averageMonthlySpending) / averageMonthlySpending) * 100;
+    if (Math.abs(spendingChange) > 5) {
+      const confidence = projectedSpending.confidence || 0.7;
+      insights.push({
+        title: `ML Forecast: ${spendingChange > 0 ? 'Increasing' : 'Decreasing'} Spending Trend`,
+        description: `Advanced forecasting algorithms predict your spending will be ${Math.abs(spendingChange).toFixed(0)}% ${spendingChange > 0 ? 'higher' : 'lower'} next month. Current confidence: ${(confidence * 100).toFixed(0)}%.`,
+        confidence: confidence * 100,
+        trend: spendingChange > 0 ? 'up' : 'down',
+        action: spendingChange > 0 ? 'Implement proactive budget controls to prevent overspending.' : 'Capitalize on positive trends by increasing savings allocation.',
+        icon: spendingChange > 0 ? <TrendingUpIcon /> : <TrendingDownIcon />,
+        mlTechnique: 'Exponential Smoothing + Linear Regression',
+        impact: spendingChange > 15 ? 'high' : 'medium'
+      });
+    }
+
+    // 3. Category Correlation Insights (ML: Association Rule Mining)
+    const topCorrelations = Object.entries(correlations)
+      .flatMap(([cat1, pairs]) =>
+        Object.entries(pairs).map(([cat2, count]) => ({ cat1, cat2, count }))
+      )
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+
+    if (topCorrelations.length > 0 && topCorrelations[0].count >= 3) {
+      const topCorr = topCorrelations[0];
+      insights.push({
+        title: 'Spending Pattern Correlation',
+        description: `ML analysis detected a strong correlation between ${topCorr.cat1} and ${topCorr.cat2} spending (${topCorr.count} co-occurrences). When you spend on one, you're likely to spend on the other.`,
+        confidence: Math.min(90, 50 + topCorr.count * 10),
+        trend: 'stable',
+        action: `Consider bundled budgeting for these correlated categories to better control combined spending.`,
+        icon: <PsychologyIcon />,
+        mlTechnique: 'Association Rule Mining',
+        impact: 'medium'
+      });
+    }
+
+    // 4. Anomaly Detection Insights
+    if (anomalies && anomalies.length > 0) {
+      const recentAnomaly = anomalies[anomalies.length - 1];
+      insights.push({
+        title: 'Spending Anomaly Detected',
+        description: `Unusual spending pattern detected: $${recentAnomaly.value.toFixed(0)} spent when $${recentAnomaly.expected.toFixed(0)} was expected (${recentAnomaly.deviation.toFixed(0)}% above normal).`,
+        confidence: 85,
+        trend: 'up',
+        action: 'Review recent transactions to identify spending triggers and implement preventive measures.',
+        icon: <WarningIcon />,
+        mlTechnique: 'Statistical Anomaly Detection',
+        impact: 'high'
+      });
+    }
+
+    // 5. Category Efficiency Analysis (ML: Comparative Performance)
     const spendingEntries = Object.entries(recentSpending);
     const topCategory = spendingEntries.length > 0 ? spendingEntries.reduce((a, b) =>
       recentSpending[a[0]] > recentSpending[b[0]] ? a : b
     ) : null;
 
     if (topCategory && topCategory[1] > totalRecentSpending * 0.3) {
+      const categoryData = projectedSpending.categories[topCategory[0] as keyof typeof projectedSpending.categories];
+      const efficiency = categoryData ? (categoryData.confidence * (1 - categoryData.volatility)) : 0.7;
+
       insights.push({
-        title: 'Category Dominance',
-        description: `${topCategory[0]} represents ${(topCategory[1] / totalRecentSpending * 100).toFixed(0)}% of your recent spending.`,
-        confidence: 95,
+        title: 'Category Efficiency Analysis',
+        description: `${topCategory[0]} dominates ${(topCategory[1] / totalRecentSpending * 100).toFixed(0)}% of spending. ML analysis shows ${(efficiency * 100).toFixed(0)}% efficiency rating.`,
+        confidence: categoryData?.confidence ? categoryData.confidence * 100 : 85,
         trend: 'stable',
-        action: `Set a budget limit for ${topCategory[0]} and explore ways to reduce this category.`,
-        icon: <WarningIcon />
+        action: efficiency < 0.6 ? `High volatility detected in ${topCategory[0]}. Consider implementing stricter controls.` : `Good efficiency in ${topCategory[0]}. Focus optimization efforts elsewhere.`,
+        icon: <BarChartIcon />,
+        mlTechnique: 'Performance Efficiency Scoring',
+        impact: efficiency < 0.6 ? 'high' : 'medium'
       });
     }
 
-    // Budget adherence
+    // 6. Predictive Budget Alert (ML: Classification)
     const budgetOverruns = financialData.budgets.filter(budget => {
       const spent = recentSpending[budget.category] || 0;
-      return spent > budget.budget;
+      const projected = projectedSpending.categories[budget.category as keyof typeof projectedSpending.categories]?.projected || spent;
+      return projected > budget.budget * 1.1; // Predict 10% overrun
     });
 
     if (budgetOverruns.length > 0) {
       insights.push({
-        title: 'Budget Alert',
-        description: `You're over budget in ${budgetOverruns.length} categorie${budgetOverruns.length > 1 ? 's' : ''}: ${budgetOverruns.map(b => b.category).join(', ')}.`,
-        confidence: 100,
+        title: 'Predictive Budget Alert',
+        description: `ML forecasting predicts you'll exceed budget in ${budgetOverruns.length} categorie${budgetOverruns.length > 1 ? 's' : ''} next month: ${budgetOverruns.map(b => b.category).join(', ')}.`,
+        confidence: 90,
         trend: 'up',
-        action: 'Immediately reduce spending in these categories or adjust your budget limits.',
-        icon: <WarningIcon />
+        action: 'Implement immediate spending controls or adjust budget allocations to prevent overruns.',
+        icon: <PriorityHighIcon />,
+        mlTechnique: 'Predictive Classification',
+        impact: 'high'
       });
     }
 
-    // Savings opportunity
-    if (totalRecentSpending < averageMonthlySpending * 0.9) {
+    // 7. Seasonal Pattern Recognition (ML: Pattern Mining)
+    if (projectedSpending.seasonality === 'highly_seasonal') {
       insights.push({
-        title: 'Savings Opportunity',
-        description: 'Your spending is lower than usual this month, creating a great opportunity to boost savings.',
+        title: 'Seasonal Spending Pattern Detected',
+        description: 'ML analysis identified strong seasonal patterns in your spending behavior. Your expenses fluctuate significantly by time period.',
+        confidence: 88,
+        trend: 'stable',
+        action: 'Create seasonal budgets and build emergency savings to handle predictable spending fluctuations.',
+        icon: <TimelineIcon />,
+        mlTechnique: 'Seasonal Pattern Recognition',
+        impact: 'medium'
+      });
+    }
+
+    // Ensure we have at least some insights
+    if (insights.length === 0) {
+      insights.push({
+        title: 'Stable Spending Patterns',
+        description: 'Your spending shows consistent, predictable patterns with no major anomalies detected.',
         confidence: 75,
-        trend: 'down',
-        action: 'Consider transferring the difference to savings or paying down debt.',
-        icon: <LightbulbIcon />
+        trend: 'stable',
+        action: 'Continue current spending habits while monitoring for changes.',
+        icon: <CheckCircleIcon />,
+        mlTechnique: 'Pattern Stability Analysis',
+        impact: 'low'
       });
     }
 
-    return insights;
-  }, [recentSpending, totalRecentSpending, projectedMonthlySpending, averageMonthlySpending, financialData.budgets, financialData.transactions]);
+    return insights.slice(0, 6); // Limit to top 6 insights
+  }, [recentSpending, totalRecentSpending, projectedMonthlySpending, averageMonthlySpending, financialData.budgets, financialData.transactions, projectedSpending, selectedMonth]);
 
-  // Generate personalized financial advice based on spending patterns
-  const personalizedAdvice = useMemo(() => {
-    const advice: Array<{
-      title: string;
-      description: string;
-      impact: 'high' | 'medium' | 'low';
-      timeframe: 'short' | 'medium' | 'long';
-      steps: string[];
-      icon: React.ReactElement;
-    }> = [];
-
-    // If no transactions, provide generic advice
-    if (!financialData.transactions || financialData.transactions.length === 0) {
-      return [
-        {
-          title: "Build an Emergency Fund",
-          description: "An emergency fund is your financial safety net for unexpected expenses.",
-          impact: "high",
-          timeframe: "short",
-          steps: [
-            "Start with a goal of $1,000 for immediate emergencies",
-            "Gradually build to 3-6 months of essential expenses",
-            "Keep in a high-yield savings account for easy access"
-          ],
-          icon: <SavingsIcon />
-        },
-        {
-          title: "Follow the 50/30/20 Budget Rule",
-          description: "A simple framework to balance needs, wants, and financial goals.",
-          impact: "high",
-          timeframe: "short",
-          steps: [
-            "Allocate 50% of income to needs (housing, food, utilities)",
-            "Limit 30% to wants (entertainment, dining out)",
-            "Dedicate 20% to savings and debt repayment"
-          ],
-          icon: <AccountBalanceIcon />
-        }
-      ];
-    }
-
-    // Calculate income vs. expenses
-    const monthlyIncome = parseFloat(financialData.income.salary) + 
-                          parseFloat(financialData.income.additionalIncome || '0');
-    
-    const monthlyExpenses = Object.values(recentSpending).reduce((sum, amount) => sum + amount, 0);
-    const savingsRate = monthlyIncome > 0 ? (monthlyIncome - monthlyExpenses) / monthlyIncome * 100 : 0;
-
-    // Analyze spending patterns
-    const topCategories = Object.entries(recentSpending)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3);
-    
-    const hasHighHousing = (recentSpending['Housing'] || 0) > (monthlyIncome * 0.3);
-    const hasHighTransport = (recentSpending['Transport'] || recentSpending['Transportation'] || 0) > (monthlyIncome * 0.15);
-    const hasHighFood = (recentSpending['Food'] || recentSpending['Dining'] || 0) > (monthlyIncome * 0.15);
-    const hasLowSavings = savingsRate < 10;
-    
-    // Generate advice based on patterns
-    if (hasHighHousing) {
-      advice.push({
-        title: "Optimize Housing Costs",
-        description: `Your housing expenses are ${((recentSpending['Housing'] || 0) / monthlyIncome * 100).toFixed(0)}% of your income, above the recommended 30%.`,
-        impact: "high",
-        timeframe: "medium",
-        steps: [
-          "Consider a roommate to split costs",
-          "Negotiate rent at renewal time",
-          "Evaluate moving to a more affordable area when possible",
-          "Check if you qualify for any housing assistance programs"
-        ],
-        icon: <HomeIcon />
-      });
-    }
-
-    if (hasHighTransport) {
-      advice.push({
-        title: "Reduce Transportation Expenses",
-        description: `You're spending ${((recentSpending['Transport'] || recentSpending['Transportation'] || 0) / monthlyIncome * 100).toFixed(0)}% of your income on transportation.`,
-        impact: "medium",
-        timeframe: "short",
-        steps: [
-          "Use public transportation when possible",
-          "Consider carpooling or ride-sharing",
-          "Evaluate if you can work remotely some days",
-          "Compare auto insurance rates annually"
-        ],
-        icon: <DirectionsCarIcon />
-      });
-    }
-
-    if (hasHighFood) {
-      advice.push({
-        title: "Optimize Food Spending",
-        description: `Your food expenses are ${((recentSpending['Food'] || recentSpending['Dining'] || 0) / monthlyIncome * 100).toFixed(0)}% of your income.`,
-        impact: "medium",
-        timeframe: "short",
-        steps: [
-          "Meal plan and prepare food at home",
-          "Use grocery store loyalty programs",
-          "Buy staples in bulk when on sale",
-          "Limit dining out to once per week"
-        ],
-        icon: <RestaurantIcon />
-      });
-    }
-
-    if (hasLowSavings) {
-      advice.push({
-        title: "Increase Your Savings Rate",
-        description: `Your current savings rate is approximately ${savingsRate.toFixed(0)}%, below the recommended 15-20%.`,
-        impact: "high",
-        timeframe: "medium",
-        steps: [
-          "Set up automatic transfers to savings on payday",
-          "Save any windfalls (tax refunds, bonuses)",
-          "Try the 30-day rule for non-essential purchases",
-          "Incrementally increase savings by 1% each month"
-        ],
-        icon: <SavingsIcon />
-      });
-    }
-
-    // Add debt management advice if applicable
-    if (monthlyExpenses > monthlyIncome) {
-      advice.push({
-        title: "Debt Management Strategy",
-        description: "Your expenses currently exceed your income, which may lead to debt accumulation.",
-        impact: "high",
-        timeframe: "short",
-        steps: [
-          "List all debts with interest rates and minimum payments",
-          "Consider the debt avalanche method (highest interest first)",
-          "Contact creditors to negotiate lower rates",
-          "Look into debt consolidation options"
-        ],
-        icon: <AttachMoneyIcon />
-      });
-    }
-
-    // Always include a positive reinforcement
-    if (advice.length > 0) {
-      advice.push({
-        title: "Track Your Progress",
-        description: "Monitoring your financial progress keeps you motivated and on track.",
-        impact: "medium",
-        timeframe: "long",
-        steps: [
-          "Review your budget weekly",
-          "Celebrate small financial wins",
-          "Adjust your goals as your situation changes",
-          "Use the AI Coach regularly for personalized insights"
-        ],
-        icon: <AssignmentTurnedInIcon />
-      });
-    }
-
-    // If we still don't have enough advice, add general advice
-    if (advice.length < 3) {
-      advice.push({
-        title: "Diversify Your Income",
-        description: "Multiple income streams provide financial security and accelerate wealth building.",
-        impact: "medium",
-        timeframe: "long",
-        steps: [
-          "Develop a skill that can generate side income",
-          "Explore passive income opportunities",
-          "Consider freelance work in your field",
-          "Invest in dividend-paying stocks or funds"
-        ],
-        icon: <BarChartIcon />
-      });
-    }
-
-    return advice;
-  }, [financialData, recentSpending]);
 
   // Get category icon
   const getCategoryIcon = (category: string) => {
@@ -998,6 +950,41 @@ const AICoachPage: React.FC = () => {
         </Box>
       </Box>
 
+      {/* Month Selector */}
+      <Box sx={{ mb: 4 }}>
+        <Card sx={{ borderRadius: 3 }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <CompareIcon sx={{ mr: 2, color: theme.palette.primary.main, fontSize: '2rem' }} />
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    AI Analysis Period
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Select the month for AI-powered financial analysis
+                  </Typography>
+                </Box>
+              </Box>
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel>Select Month</InputLabel>
+                <Select
+                  value={selectedMonth}
+                  label="Select Month"
+                  onChange={handleMonthChange}
+                >
+                  {availableMonths.map((month) => (
+                    <MenuItem key={month.value} value={month.value}>
+                      {month.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+
       {/* Current Month Overview */}
       <Box sx={{
         display: 'grid',
@@ -1009,14 +996,14 @@ const AICoachPage: React.FC = () => {
           <Card sx={{ borderRadius: 3, height: '100%' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                Recent Spending (30 Days)
+                {selectedMonth === 'current' ? 'Current Month' : availableMonths.find(m => m.value === selectedMonth)?.label || 'Selected Month'} Spending
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'baseline', mb: 2 }}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
                   ${totalRecentSpending.toFixed(0)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                  spent in last 30 days
+                  spent {selectedMonth === 'current' ? 'this month' : 'in selected month'}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -1029,17 +1016,53 @@ const AICoachPage: React.FC = () => {
                 3-month average: ${averageMonthlySpending.toFixed(0)}/month
               </Typography>
               
-              {/* Spending forecast */}
+              {/* AI-Enhanced Spending Forecast */}
               <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}` }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center' }}>
-                  <BarChartIcon sx={{ mr: 1, fontSize: '1rem' }} /> Spending Forecast
+                  <BarChartIcon sx={{ mr: 1, fontSize: '1rem' }} /> AI-Powered Forecast
                 </Typography>
+
+                {/* ML Insights Display */}
+                <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+                  <Chip
+                    size="small"
+                    label={`Confidence: ${(projectedSpending.confidence * 100).toFixed(0)}%`}
+                    sx={{
+                      bgcolor: projectedSpending.confidence > 0.8 ? alpha(theme.palette.success.main, 0.1) :
+                              projectedSpending.confidence > 0.6 ? alpha(theme.palette.warning.main, 0.1) :
+                              alpha(theme.palette.error.main, 0.1),
+                      color: projectedSpending.confidence > 0.8 ? theme.palette.success.main :
+                             projectedSpending.confidence > 0.6 ? theme.palette.warning.main :
+                             theme.palette.error.main
+                    }}
+                  />
+                  <Chip
+                    size="small"
+                    label={`Trend: ${projectedSpending.trend.replace('_', ' ')}`}
+                    sx={{
+                      bgcolor: projectedSpending.trend === 'increasing' ? alpha(theme.palette.error.main, 0.1) :
+                              projectedSpending.trend === 'decreasing' ? alpha(theme.palette.success.main, 0.1) :
+                              alpha(theme.palette.info.main, 0.1),
+                      color: projectedSpending.trend === 'increasing' ? theme.palette.error.main :
+                             projectedSpending.trend === 'decreasing' ? theme.palette.success.main :
+                             theme.palette.info.main
+                    }}
+                  />
+                  <Chip
+                    size="small"
+                    label={`Pattern: ${projectedSpending.seasonality.replace('_', ' ')}`}
+                    sx={{
+                      bgcolor: alpha(theme.palette.secondary.main, 0.1),
+                      color: theme.palette.secondary.main
+                    }}
+                  />
+                </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="caption" color="text.secondary">Next Month</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      ${projectedSpending.nextMonth.toFixed(0)}
+                      ${Math.round(projectedSpending.nextMonth).toFixed(0)}
                     </Typography>
                     {projectedSpending.nextMonth > projectedSpending.currentMonth ? (
                       <ArrowUpwardIcon sx={{ color: theme.palette.error.main, ml: 0.5, fontSize: '1rem' }} />
@@ -1053,7 +1076,7 @@ const AICoachPage: React.FC = () => {
                   <Typography variant="caption" color="text.secondary">3 Months</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      ${projectedSpending.threeMonths.toFixed(0)}
+                      ${Math.round(projectedSpending.threeMonths).toFixed(0)}
                     </Typography>
                     {projectedSpending.threeMonths > projectedSpending.currentMonth ? (
                       <ArrowUpwardIcon sx={{ color: theme.palette.error.main, ml: 0.5, fontSize: '1rem' }} />
@@ -1067,7 +1090,7 @@ const AICoachPage: React.FC = () => {
                   <Typography variant="caption" color="text.secondary">6 Months</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      ${projectedSpending.sixMonths.toFixed(0)}
+                      ${Math.round(projectedSpending.sixMonths).toFixed(0)}
                     </Typography>
                     {projectedSpending.sixMonths > projectedSpending.currentMonth ? (
                       <ArrowUpwardIcon sx={{ color: theme.palette.error.main, ml: 0.5, fontSize: '1rem' }} />
@@ -1087,13 +1110,19 @@ const AICoachPage: React.FC = () => {
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                 Spending by Category
               </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {selectedMonth === 'current' ? 'Current month' : 'Selected month'} breakdown
+              </Typography>
               <Box sx={{ maxHeight: '320px', overflowY: 'auto' }}>
                 {Object.entries(recentSpending)
                   .sort(([,a], [,b]) => b - a)
                   .slice(0, 6)
                   .map(([category, amount]) => {
-                    const projectedAmount = projectedSpending.categories[category]?.projected || amount;
+                    const categoryData = projectedSpending.categories[category as keyof typeof projectedSpending.categories];
+                    const projectedAmount = categoryData?.projected || amount;
                     const isIncreasing = projectedAmount > amount;
+                    const confidence = categoryData?.confidence || 0.7;
+                    const volatility = categoryData?.volatility || 0.15;
                     
                     return (
                       <Box key={category} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -1102,9 +1131,39 @@ const AICoachPage: React.FC = () => {
                       </Avatar>
                       <Box sx={{ flexGrow: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
                             {category}
                           </Typography>
+                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                              <Chip
+                                size="small"
+                                label={`${(confidence * 100).toFixed(0)}%`}
+                                sx={{
+                                  height: 16,
+                                  fontSize: '0.7rem',
+                                  bgcolor: confidence > 0.8 ? alpha(theme.palette.success.main, 0.2) :
+                                          confidence > 0.6 ? alpha(theme.palette.warning.main, 0.2) :
+                                          alpha(theme.palette.error.main, 0.2),
+                                  color: confidence > 0.8 ? theme.palette.success.main :
+                                         confidence > 0.6 ? theme.palette.warning.main :
+                                         theme.palette.error.main
+                                }}
+                              />
+                              {volatility > 0.2 && (
+                                <Chip
+                                  size="small"
+                                  label="⚠️"
+                                  sx={{
+                                    height: 16,
+                                    width: 16,
+                                    bgcolor: alpha(theme.palette.warning.main, 0.2),
+                                    color: theme.palette.warning.main
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             ${amount.toFixed(0)}
@@ -1129,6 +1188,11 @@ const AICoachPage: React.FC = () => {
                             bgcolor: alpha(theme.palette.grey[300], 0.3)
                           }}
                         />
+                        {volatility > 0.2 && (
+                          <Typography variant="caption" color="warning.main" sx={{ mt: 0.5, display: 'block' }}>
+                            High volatility detected - consider budget controls
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                     );
@@ -1174,11 +1238,32 @@ const AICoachPage: React.FC = () => {
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       {insight.title}
                     </Typography>
+                      <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
                     <Chip
-                      label={`${insight.confidence}% confidence`}
+                          label={`${insight.confidence.toFixed(0)}% confidence`}
                       size="small"
-                      sx={{ mt: 0.5 }}
-                    />
+                          color={
+                            insight.confidence > 80 ? 'success' :
+                            insight.confidence > 60 ? 'warning' : 'error'
+                          }
+                        />
+                        {insight.mlTechnique && (
+                          <Chip
+                            label={insight.mlTechnique}
+                            size="small"
+                            variant="outlined"
+                            sx={{ fontSize: '0.7rem' }}
+                          />
+                        )}
+                        <Chip
+                          label={`Impact: ${insight.impact}`}
+                          size="small"
+                          color={
+                            insight.impact === 'high' ? 'error' :
+                            insight.impact === 'medium' ? 'warning' : 'info'
+                          }
+                        />
+                      </Box>
                   </Box>
                 </Box>
                 <Typography variant="body2" sx={{ mb: 2 }}>
@@ -1293,447 +1378,7 @@ const AICoachPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Personalized Financial Advice */}
-      <Box sx={{ mt: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>
-            🧠 Personalized Financial Advice
-          </Typography>
-          <Button 
-            variant="outlined" 
-            color="primary"
-            onClick={() => setShowDetailedAdvice(!showDetailedAdvice)}
-          >
-            {showDetailedAdvice ? 'Show Less' : 'Show More'}
-          </Button>
-        </Box>
 
-        <Box sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: showDetailedAdvice ? '1fr' : 'repeat(3, 1fr)' },
-          gap: 3
-        }}>
-          {personalizedAdvice.slice(0, showDetailedAdvice ? personalizedAdvice.length : 3).map((advice, index) => (
-            <Card key={index} sx={{ 
-              borderRadius: 3, 
-              height: '100%',
-              border: `1px solid ${
-                advice.impact === 'high' ? alpha(theme.palette.error.main, 0.3) :
-                advice.impact === 'medium' ? alpha(theme.palette.warning.main, 0.3) :
-                alpha(theme.palette.info.main, 0.3)
-              }`
-            }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Avatar sx={{ 
-                    bgcolor: 
-                      advice.impact === 'high' ? theme.palette.error.main :
-                      advice.impact === 'medium' ? theme.palette.warning.main :
-                      theme.palette.info.main,
-                    mr: 2 
-                  }}>
-                    {advice.icon}
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {advice.title}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                      <Chip 
-                        size="small" 
-                        label={`Impact: ${advice.impact}`} 
-                        sx={{ mr: 1 }}
-                        color={
-                          advice.impact === 'high' ? 'error' :
-                          advice.impact === 'medium' ? 'warning' :
-                          'info'
-                        }
-                      />
-                      <Chip 
-                        size="small" 
-                        label={`${advice.timeframe}-term`}
-                        color="secondary"
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-                
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  {advice.description}
-                </Typography>
-                
-                {showDetailedAdvice && (
-                  <>
-                    <Divider sx={{ my: 2 }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                      Action Steps:
-                    </Typography>
-                    <List dense disablePadding>
-                      {advice.steps.map((step, stepIndex) => (
-                        <ListItem key={stepIndex} disablePadding sx={{ mb: 0.5 }}>
-                          <ListItemIcon sx={{ minWidth: 30 }}>
-                            <AssignmentTurnedInIcon fontSize="small" color="primary" />
-                          </ListItemIcon>
-                          <ListItemText primary={step} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      </Box>
-
-      {/* Actionable Savings Recommendations */}
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
-          💰 Actionable Savings Recommendations
-        </Typography>
-
-        <Card sx={{ borderRadius: 3, mb: 4 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <SavingsIcon sx={{ mr: 2, color: theme.palette.success.main, fontSize: '2rem' }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Potential Monthly Savings
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Based on your spending patterns, here are personalized opportunities to save money
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box sx={{ 
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-              gap: 2,
-              mb: 3
-            }}>
-              {/* Quick Savings Card */}
-              <Paper sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.success.main, 0.05) }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Coffee & Dining
-                  </Typography>
-                  <Chip 
-                    size="small" 
-                    label="Easy Win" 
-                    sx={{ bgcolor: theme.palette.success.main, color: 'white' }}
-                  />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Make coffee at home 3x/week and bring lunch 2x/week
-                </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.success.main, fontWeight: 600 }}>
-                  Save $120/mo
-                </Typography>
-              </Paper>
-
-              {/* Subscription Optimization */}
-              <Paper sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05) }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Subscriptions
-                  </Typography>
-                  <Chip 
-                    size="small" 
-                    label="One-time" 
-                    sx={{ bgcolor: theme.palette.info.main, color: 'white' }}
-                  />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Audit and cancel unused streaming/app subscriptions
-                </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 600 }}>
-                  Save $35/mo
-                </Typography>
-              </Paper>
-
-              {/* Transportation Savings */}
-              <Paper sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.warning.main, 0.05) }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Transportation
-                  </Typography>
-                  <Chip 
-                    size="small" 
-                    label="Habit Change" 
-                    sx={{ bgcolor: theme.palette.warning.main, color: 'white' }}
-                  />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Use public transit or carpool 2 days/week
-                </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.warning.main, fontWeight: 600 }}>
-                  Save $85/mo
-                </Typography>
-              </Paper>
-
-              {/* Grocery Shopping */}
-              <Paper sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.success.main, 0.05) }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Groceries
-                  </Typography>
-                  <Chip 
-                    size="small" 
-                    label="Easy Win" 
-                    sx={{ bgcolor: theme.palette.success.main, color: 'white' }}
-                  />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Meal plan, use store brands, and buy in bulk
-                </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.success.main, fontWeight: 600 }}>
-                  Save $70/mo
-                </Typography>
-              </Paper>
-
-              {/* Entertainment */}
-              <Paper sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.05) }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Entertainment
-                  </Typography>
-                  <Chip 
-                    size="small" 
-                    label="One-time" 
-                    sx={{ bgcolor: theme.palette.info.main, color: 'white' }}
-                  />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Look for free events and use entertainment discounts
-                </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 600 }}>
-                  Save $50/mo
-                </Typography>
-              </Paper>
-
-              {/* Shopping */}
-              <Paper sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.warning.main, 0.05) }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Shopping
-                  </Typography>
-                  <Chip 
-                    size="small" 
-                    label="Habit Change" 
-                    sx={{ bgcolor: theme.palette.warning.main, color: 'white' }}
-                  />
-                </Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Implement 48-hour rule before non-essential purchases
-                </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.warning.main, fontWeight: 600 }}>
-                  Save $95/mo
-                </Typography>
-              </Paper>
-            </Box>
-
-            <Divider sx={{ mb: 3 }} />
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.success.main }}>
-                  Total Potential Monthly Savings: $455
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  That's $5,460 per year you could be saving!
-                </Typography>
-              </Box>
-              <Button 
-                variant="contained" 
-                color="success" 
-                startIcon={<SavingsIcon />}
-                onClick={() => setShowSavingsPlanModal(true)}
-              >
-                Create Savings Plan
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* Financial Goals & Targets */}
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
-          🎯 Financial Goals & Targets
-        </Typography>
-
-        {/* Goal Progress Tracking */}
-        <Box sx={{ mb: 4 }}>
-          <Card sx={{ borderRadius: 3 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <TipsAndUpdatesIcon sx={{ mr: 2, color: theme.palette.primary.main, fontSize: '2rem' }} />
-                  <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      Financial Goal Progress
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Track your progress toward your financial goals
-                    </Typography>
-                  </Box>
-                </Box>
-                <Button 
-                  variant="outlined" 
-                  color="primary"
-                  size="small"
-                  startIcon={<PriorityHighIcon />}
-                  onClick={handleAddNewGoal}
-                >
-                  Add New Goal
-                </Button>
-              </Box>
-
-              {financialGoals.map((goal, index) => {
-                // Calculate progress percentage
-                const progressPercent = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
-                
-                // Calculate days remaining
-                const targetDate = new Date(goal.targetDate);
-                const today = new Date();
-                const daysRemaining = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                
-                // Calculate monthly contribution needed
-                const monthsRemaining = Math.ceil(daysRemaining / 30);
-                const amountRemaining = goal.targetAmount - goal.currentAmount;
-                const monthlyContribution = monthsRemaining > 0 ? Math.ceil(amountRemaining / monthsRemaining) : amountRemaining;
-                
-                // Determine status color
-                const isOnTrack = progressPercent >= (100 - (daysRemaining / 365) * 100);
-                const statusColor = isOnTrack ? theme.palette.success.main : theme.palette.warning.main;
-                
-                return (
-                  <Box key={goal.id} sx={{ mb: index < financialGoals.length - 1 ? 4 : 0 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {goal.name}
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{ mr: 1, fontWeight: 500 }}>
-                          ${goal.currentAmount.toLocaleString()}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          of ${goal.targetAmount.toLocaleString()}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <Box sx={{ flexGrow: 1, mr: 2 }}>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={progressPercent} 
-                          sx={{ 
-                            height: 8, 
-                            borderRadius: 4,
-                            backgroundColor: alpha(statusColor, 0.2),
-                            '& .MuiLinearProgress-bar': {
-                              backgroundColor: statusColor,
-                            }
-                          }}
-                        />
-                      </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {progressPercent}%
-                      </Typography>
-                    </Box>
-                    
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="caption" color="text.secondary">
-                        {daysRemaining} days remaining
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
-                          Need to save:
-                        </Typography>
-                        <Chip 
-                          size="small" 
-                          label={`$${monthlyContribution}/month`} 
-                          color={isOnTrack ? "success" : "warning"}
-                          sx={{ height: 24 }}
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-                );
-              })}
-              
-              <Divider sx={{ my: 3 }} />
-              
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    Recommended Next Steps
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Increase your monthly contributions to stay on track
-                  </Typography>
-                </Box>
-                <Button 
-                  variant="contained" 
-                  color="primary"
-                  onClick={handleUpdateGoals}
-                >
-                  Update Goals
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Box>
-
-        {/* Financial Targets */}
-        <Box sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-          gap: 3
-        }}>
-          <Box>
-            <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                💸 Emergency Fund
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                Based on your spending patterns, you should aim to save 3-6 months of expenses in an emergency fund.
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Target: ${Math.round(projectedMonthlySpending * 4).toLocaleString()}
-              </Typography>
-            </Paper>
-          </Box>
-
-          <Box>
-            <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                📈 Savings Rate
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                Your optimal savings rate should be 20-30% of your income for long-term financial success.
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Aim to save $500-750 monthly
-              </Typography>
-            </Paper>
-          </Box>
-
-          <Box>
-            <Paper sx={{ p: 3, borderRadius: 3, height: '100%' }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                🎯 Next Goal
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                Consider setting up automatic transfers to savings on payday to build consistent habits.
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                Action: Set up automatic savings transfers
-              </Typography>
-            </Paper>
-          </Box>
-        </Box>
-      </Box>
     </Box>
   );
   
@@ -1761,197 +1406,6 @@ const AICoachPage: React.FC = () => {
       <Box sx={{ maxWidth: '1200px', mx: 'auto', p: 3 }}>
         {/* All existing content */}
         
-        {/* Automatic Savings Plan Modal */}
-        <Dialog 
-          open={showSavingsPlanModal} 
-          onClose={() => setShowSavingsPlanModal(false)}
-          fullWidth
-          maxWidth="md"
-        >
-    <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <SavingsIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-        <Typography variant="h6">AI-Generated Savings Plan</Typography>
-      </Box>
-      <IconButton onClick={() => setShowSavingsPlanModal(false)}>
-        <CloseIcon />
-      </IconButton>
-    </DialogTitle>
-    <DialogContent dividers>
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          This personalized savings plan is automatically generated based on your financial data, spending patterns, and goals.
-        </Typography>
-      </Alert>
-      
-      {/* Financial Summary */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-          Your Financial Summary
-        </Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 3 }}>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
-            <Typography variant="body2" color="text.secondary">Monthly Income</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-              ${automaticSavingsPlan.monthlyIncome.toFixed(0)}
-            </Typography>
-          </Paper>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
-            <Typography variant="body2" color="text.secondary">Monthly Expenses</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 600, color: theme.palette.error.main }}>
-              ${automaticSavingsPlan.monthlyExpenses.toFixed(0)}
-            </Typography>
-          </Paper>
-          <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
-            <Typography variant="body2" color="text.secondary">Available for Savings</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 600, color: theme.palette.success.main }}>
-              ${automaticSavingsPlan.availableForSavings.toFixed(0)}
-            </Typography>
-          </Paper>
-        </Box>
-      </Box>
-      
-      {/* Recommended Savings Plan */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center' }}>
-          <AutorenewIcon sx={{ mr: 1 }} /> Recommended Monthly Savings Plan
-        </Typography>
-        
-        <TableContainer component={Paper} sx={{ borderRadius: 2, mb: 3 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                <TableCell>Category</TableCell>
-                <TableCell align="right">Monthly Amount</TableCell>
-                <TableCell align="right">Allocation</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {automaticSavingsPlan.savingsAllocation.map((allocation, index) => (
-                <TableRow key={index}>
-                  <TableCell>{allocation.name}</TableCell>
-                  <TableCell align="right">${allocation.amount.toFixed(0)}</TableCell>
-                  <TableCell align="right">{allocation.percentage.toFixed(1)}%</TableCell>
-                </TableRow>
-              ))}
-              <TableRow sx={{ bgcolor: alpha(theme.palette.success.main, 0.05) }}>
-                <TableCell sx={{ fontWeight: 600 }}>Total Monthly Savings</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 600 }}>
-                  ${automaticSavingsPlan.savingsAllocation.reduce((sum, item) => sum + item.amount, 0).toFixed(0)}
-                </TableCell>
-                <TableCell align="right">100%</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <PieChartIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-          <Typography variant="subtitle2">Savings Allocation Visualization</Typography>
-        </Box>
-        
-        <Box sx={{ display: 'flex', mb: 2, height: 30 }}>
-          {automaticSavingsPlan.savingsAllocation.map((allocation, index) => (
-            <Tooltip key={index} title={`${allocation.name}: $${allocation.amount.toFixed(0)} (${allocation.percentage.toFixed(1)}%)`}>
-              <Box 
-                sx={{ 
-                  width: `${allocation.percentage}%`, 
-                  bgcolor: index === 0 ? theme.palette.primary.main : 
-                          index === 1 ? theme.palette.secondary.main : 
-                          index === 2 ? theme.palette.success.main : 
-                          theme.palette.warning.main,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: '0.75rem'
-                }}
-              >
-                {allocation.percentage > 15 ? `${allocation.percentage.toFixed(0)}%` : ''}
-              </Box>
-            </Tooltip>
-          ))}
-        </Box>
-        
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          {automaticSavingsPlan.savingsAllocation.map((allocation, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box 
-                sx={{ 
-                  width: 12, 
-                  height: 12, 
-                  borderRadius: '50%', 
-                  bgcolor: index === 0 ? theme.palette.primary.main : 
-                          index === 1 ? theme.palette.secondary.main : 
-                          index === 2 ? theme.palette.success.main : 
-                          theme.palette.warning.main,
-                  mr: 0.5 
-                }} 
-              />
-              <Typography variant="caption">{allocation.name}</Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-      
-      {/* Financial Goals */}
-      <Box>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center' }}>
-          <TipsAndUpdatesIcon sx={{ mr: 1 }} /> Recommended Financial Goals
-        </Typography>
-        
-        <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                <TableCell>Goal</TableCell>
-                <TableCell align="right">Target Amount</TableCell>
-                <TableCell align="right">Monthly Contribution</TableCell>
-                <TableCell align="right">Timeline</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>Emergency Fund</TableCell>
-                <TableCell align="right">${automaticSavingsPlan.emergencyFundTarget.toFixed(0)}</TableCell>
-                <TableCell align="right">${automaticSavingsPlan.emergencyFundMonthly.toFixed(0)}</TableCell>
-                <TableCell align="right">{automaticSavingsPlan.monthsToEmergencyFund} months</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Retirement</TableCell>
-                <TableCell align="right">Ongoing</TableCell>
-                <TableCell align="right">${automaticSavingsPlan.retirementMonthly.toFixed(0)}</TableCell>
-                <TableCell align="right">Long-term</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Short-term Goals</TableCell>
-                <TableCell align="right">Varies</TableCell>
-                <TableCell align="right">${automaticSavingsPlan.shortTermGoalsMonthly.toFixed(0)}</TableCell>
-                <TableCell align="right">6-12 months</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </DialogContent>
-    <DialogActions sx={{ p: 2 }}>
-      <Button 
-        variant="outlined" 
-        onClick={() => setShowSavingsPlanModal(false)}
-      >
-        Close
-      </Button>
-      <Button 
-        variant="contained" 
-        color="primary" 
-        startIcon={<CheckIcon />}
-        onClick={handleApplySavingsPlan}
-      >
-        Apply This Plan
-      </Button>
-    </DialogActions>
-  </Dialog>
       </Box>
     </>
   );

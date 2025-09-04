@@ -14,9 +14,9 @@ import {
   Toolbar
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import InsightsIcon from '@mui/icons-material/Insights';
+import BookIcon from '@mui/icons-material/Book';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import SettingsIcon from '@mui/icons-material/Settings';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 import Header from './Header';
 import PrivacyBanner from './PrivacyBanner';
 import Footer from './Footer';
@@ -37,10 +37,26 @@ const Layout: React.FC<LayoutProps> = ({ children, onNavigate, currentPage }) =>
   };
 
   const drawerItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, page: 'dashboard' },
-    { text: 'Insights', icon: <InsightsIcon />, page: 'insights' },
-    { text: 'Budget', icon: <AccountBalanceWalletIcon />, page: 'budget' },
-    { text: 'Settings', icon: <SettingsIcon />, page: 'settings' },
+    {
+      text: 'Dashboard',
+      icon: <DashboardIcon sx={{ color: '#FFD700', fontSize: '1.2rem' }} />,
+      page: 'dashboard'
+    },
+    {
+      text: 'Transactions',
+      icon: <BookIcon sx={{ color: '#FF6B6B', fontSize: '1.2rem' }} />,
+      page: 'transactions'
+    },
+    {
+      text: 'Budget',
+      icon: <AccountBalanceWalletIcon sx={{ color: '#4ECDC4', fontSize: '1.2rem' }} />,
+      page: 'budget'
+    },
+    {
+      text: 'AI Coach',
+      icon: <PsychologyIcon sx={{ color: '#9B59B6', fontSize: '1.2rem' }} />,
+      page: 'ai-coach'
+    },
     // Hidden item for welcome screen
     { text: 'Welcome', icon: <DashboardIcon />, page: 'welcome', hidden: true },
   ];
@@ -98,8 +114,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onNavigate, currentPage }) =>
               },
             }}
           >
-            <ListItemIcon sx={{ 
-              color: currentPage === item.page ? theme.palette.primary.main : 'inherit',
+            <ListItemIcon sx={{
               minWidth: 40
             }}>
               {item.icon}
@@ -189,7 +204,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onNavigate, currentPage }) =>
           </Box>
         </Container>
         
-        <Footer />
+        <Footer onNavigate={onNavigate} />
       </Box>
     </Box>
   );

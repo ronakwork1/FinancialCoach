@@ -10,33 +10,12 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const SpendingBreakdownChart: React.FC = () => {
   const theme = useTheme();
   const { financialData } = useFinancial();
-  const [timeframe, setTimeframe] = useState<'all' | 'month' | 'year'>('all');
+  const [timeframe, setTimeframe] = useState<'all'>('all');
   const [chartType, setChartType] = useState<'pie' | 'doughnut'>('doughnut');
 
   const chartData = useMemo(() => {
-    // Filter transactions based on timeframe
-    let filteredTransactions = financialData.transactions.filter(transaction => transaction.type === 'expense');
-
-    if (timeframe !== 'all') {
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
-      filteredTransactions = filteredTransactions.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
-        const transactionMonth = transactionDate.getMonth();
-        const transactionYear = transactionDate.getFullYear();
-
-        if (timeframe === 'month') {
-          // Filter for current month and year
-          return transactionMonth === currentMonth && transactionYear === currentYear;
-        } else if (timeframe === 'year') {
-          // Filter for current year only
-          return transactionYear === currentYear;
-        }
-        return true;
-      });
-    }
+    // Get all expense transactions (no filtering needed since we only support 'all' timeframe)
+    const filteredTransactions = financialData.transactions.filter(transaction => transaction.type === 'expense');
 
     // Group expenses by category
     const categoryTotals: Record<string, number> = {};
@@ -86,9 +65,9 @@ const SpendingBreakdownChart: React.FC = () => {
       }],
       totalExpenses,
       categoryCount: sortedCategories.length,
-      timeframe: timeframe === 'all' ? 'All Time' : timeframe === 'month' ? 'This Month' : 'This Year'
+      timeframe: 'All Time'
     };
-  }, [financialData.transactions, timeframe]);
+  }, [financialData.transactions]);
 
   const options = {
     responsive: true,
@@ -234,7 +213,7 @@ const SpendingBreakdownChart: React.FC = () => {
               fontSize: { xs: '0.8rem', sm: '0.875rem' }
             }}
           >
-            Try selecting "All Time" or add more transactions to see your spending breakdown analysis.
+            Add more transactions to see your spending breakdown analysis.
           </Typography>
         </Box>
       </Box>
@@ -422,32 +401,6 @@ const SpendingBreakdownChart: React.FC = () => {
               }}
             >
               All Time
-            </Button>
-            <Button
-              onClick={() => setTimeframe('year')}
-              variant={timeframe === 'year' ? 'contained' : 'outlined'}
-              sx={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                textTransform: 'none',
-                borderRadius: 1,
-                flex: { xs: '1 1 auto', sm: 'none' }
-              }}
-            >
-              This Year
-            </Button>
-            <Button
-              onClick={() => setTimeframe('month')}
-              variant={timeframe === 'month' ? 'contained' : 'outlined'}
-              sx={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                textTransform: 'none',
-                borderRadius: 1,
-                flex: { xs: '1 1 auto', sm: 'none' }
-              }}
-            >
-              This Month
             </Button>
           </ButtonGroup>
         </Box>
