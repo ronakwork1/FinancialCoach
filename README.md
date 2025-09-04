@@ -4,7 +4,7 @@ A comprehensive personal finance management application that empowers users to t
 
 ## 🎥 Demo
 
-Watch our presentation demo to see the app in action: [Smart Financial Coach Demo](https://youtu.be/0vRUzcJof98)
+Watch my presentation demo to see the app in action: [Smart Financial Coach Demo](https://youtu.be/0vRUzcJof98)
 
 ## ✨ What This App Does
 
