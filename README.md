@@ -2,14 +2,13 @@
 
 A comprehensive personal finance management application that empowers users to take control of their financial health through intelligent insights, detailed analytics, and privacy-first design.
 
-![Financial Dashboard Preview](https://via.placeholder.com/800x400/1565c0/ffffff?text=Smart+Financial+Coach+Dashboard)
-
 ## ✨ What This App Does
 
 Smart Financial Coach is your personal financial companion that transforms raw financial data into actionable insights. Whether you're a freelancer managing variable income, a professional tracking expenses, or a student learning financial literacy, our app provides:
 
 - **📊 Real-time Financial Dashboard** - Monitor your income, expenses, and savings at a glance
 - **🤖 AI-Powered Financial Coach** - Receive personalized recommendations based on your spending patterns
+- **💰 Budget Management** - Set spending limits, track progress, and get forecasting insights
 - **📈 Advanced Analytics** - Track trends, identify money leaks, and optimize your budget
 - **🎯 Goal Tracking** - Set and monitor savings goals with visual progress indicators
 - **📱 Mobile-First Design** - Access your finances anywhere, anytime
@@ -24,17 +23,27 @@ Smart Financial Coach is your personal financial companion that transforms raw f
 - **Top Expense Categories** - Identify where your money goes
 - **Money Leak Detection** - Find unnecessary expenses and saving opportunities
 
-### AI Financial Coach
+### Budget Management 💰
+- **Category-wise Budgeting** - Set spending limits for different expense categories (Food, Transportation, Housing, etc.)
+- **Budget Progress Tracking** - Visual progress bars showing spending vs. budget limits
+- **Budget Forecasting** - Predict end-of-month spending based on current patterns
+- **Actionable Savings Advice** - Get personalized tips to stay within budget (e.g., "Skip 2 coffee runs per week to save $10/week")
+- **Multi-period Analysis** - Track budgets for current month, last month, last 3 months, or all time
+- **Budget Reset** - Easily reset budgets for new monthly cycles
+- **Automatic Budget Suggestions** - AI-generated budget recommendations based on your spending history
+
+### AI Financial Coach 🤖
 - **Personalized Insights** - AI-driven recommendations tailored to your financial situation
 - **Spending Pattern Analysis** - Understand your habits and get improvement suggestions
 - **Budget Optimization** - Smart suggestions for better money management
 - **Goal Achievement Planning** - Step-by-step guidance toward financial objectives
+- **Category-specific Advice** - Targeted recommendations for each spending category
 
 ### Data Management
 - **Transaction Tracking** - Log income and expenses with categories and dates
-- **Budget Planning** - Set spending limits and track progress
 - **Sample Data** - Explore with pre-loaded datasets for freelancers, professionals, and students
 - **Data Export** - Export your financial data as CSV for external analysis
+- **Local Storage** - All data stored securely on your device
 
 ## 🛠 Technology Stack
 
@@ -99,17 +108,33 @@ http://localhost:3000
 3. Fill in details: amount, category, date, and description
 4. Use **sample data** to explore features without entering real data
 
+### Setting Up Budgets 💰
+1. Navigate to **Budget** page from the main menu
+2. The app automatically suggests budgets based on your spending patterns
+3. Click the **Edit** button on any category to customize budget limits
+4. Set monthly spending limits for categories like Food, Transportation, Housing, etc.
+5. Use the **Time Period** selector to analyze different periods
+
+### Managing Your Budgets
+1. **Track Progress**: Monitor spending vs. budget with visual progress bars
+2. **Get Forecasts**: See projected end-of-month spending based on current patterns
+3. **Receive Advice**: Get personalized savings tips when approaching budget limits
+4. **Reset Monthly**: Use the "Reset Budgets" button to start fresh each month
+5. **Edit Categories**: Adjust budget limits anytime by clicking the edit icon
+
 ### Understanding Your Dashboard
 - **Financial Health Score**: Overall assessment (0-100) of your financial well-being
 - **Monthly Trends**: See how your spending changes over time
 - **Top Categories**: Your biggest expense categories
 - **Money Leaks**: Potential areas for cost savings
+- **Budget Overview**: Circular progress indicator showing overall budget health
 
-### Using the AI Coach
+### Using the AI Coach 🤖
 1. Go to **AI Coach** page
-2. Select a time period to analyze
+2. Select a time period to analyze (Current Month, Last Month, etc.)
 3. Review personalized insights and recommendations
-4. Follow suggested actions to improve your financial health
+4. Get actionable advice for specific spending categories
+5. Follow suggested actions to improve your financial health
 
 ## 🎯 Sample Data Available
 
