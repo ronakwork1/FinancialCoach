@@ -273,10 +273,6 @@ Smart Financial Coach
 │   ├── Personalized Insights
 │   ├── Recommendations
 │   └── Action Items
-├── Settings
-│   ├── Data Management
-│   ├── Preferences
-│   └── Privacy Controls
 └── Support
     ├── About
     ├── Privacy Policy
