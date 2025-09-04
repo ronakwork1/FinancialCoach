@@ -8,10 +8,9 @@ Smart Financial Coach is your personal financial companion that transforms raw f
 
 - **📊 Real-time Financial Dashboard** - Monitor your income, expenses, and savings at a glance
 - **🤖 AI-Powered Financial Coach** - Receive personalized recommendations based on your spending patterns
-- **💰 Budget Management** - Set spending limits, track progress, and get forecasting insights
-- **📈 Advanced Analytics** - Track trends, identify money leaks, and optimize your budget
-- **🎯 Goal Tracking** - Set and monitor savings goals with visual progress indicators
-- **📱 Mobile-First Design** - Access your finances anywhere, anytime
+- **💰 Budget Management** - Set spending limits and track progress against your budgets
+- **📈 Advanced Analytics** - Track trends, identify money leaks, and analyze spending patterns
+- **📱 Responsive Design** - Works on desktop, tablet, and mobile devices
 - **🔒 Privacy by Design** - All data stays on your device, no cloud storage required
 
 ## 🚀 Key Features
@@ -26,17 +25,15 @@ Smart Financial Coach is your personal financial companion that transforms raw f
 ### Budget Management 💰
 - **Category-wise Budgeting** - Set spending limits for different expense categories (Food, Transportation, Housing, etc.)
 - **Budget Progress Tracking** - Visual progress bars showing spending vs. budget limits
-- **Budget Forecasting** - Predict end-of-month spending based on current patterns
-- **Actionable Savings Advice** - Get personalized tips to stay within budget (e.g., "Skip 2 coffee runs per week to save $10/week")
+- **Budget Forecasting** - Predict end-of-month spending based on current month patterns
+- **Actionable Savings Advice** - Get personalized tips when approaching budget limits
 - **Multi-period Analysis** - Track budgets for current month, last month, last 3 months, or all time
-- **Budget Reset** - Easily reset budgets for new monthly cycles
-- **Automatic Budget Suggestions** - AI-generated budget recommendations based on your spending history
+- **Budget Editing** - Easily adjust budget limits for any category
 
 ### AI Financial Coach 🤖
 - **Personalized Insights** - AI-driven recommendations tailored to your financial situation
 - **Spending Pattern Analysis** - Understand your habits and get improvement suggestions
 - **Budget Optimization** - Smart suggestions for better money management
-- **Goal Achievement Planning** - Step-by-step guidance toward financial objectives
 - **Category-specific Advice** - Targeted recommendations for each spending category
 
 ### Data Management
@@ -100,7 +97,7 @@ http://localhost:3000
 ### Getting Started
 1. **Welcome Screen** - Choose to explore sample data or start with your own data
 2. **Dashboard Overview** - Get familiar with your financial metrics and charts
-3. **Enter Data** - Add your income sources, expenses, and savings goals
+3. **Enter Data** - Add your income and expense information
 
 ### Adding Financial Data
 1. Navigate to **Transactions** page
@@ -110,28 +107,26 @@ http://localhost:3000
 
 ### Setting Up Budgets 💰
 1. Navigate to **Budget** page from the main menu
-2. The app automatically suggests budgets based on your spending patterns
+2. View default budget categories (Housing, Food, Transportation, etc.)
 3. Click the **Edit** button on any category to customize budget limits
-4. Set monthly spending limits for categories like Food, Transportation, Housing, etc.
-5. Use the **Time Period** selector to analyze different periods
+4. Set monthly spending limits for each category
+5. Use the **Time Period** selector to analyze different time periods
 
 ### Managing Your Budgets
 1. **Track Progress**: Monitor spending vs. budget with visual progress bars
-2. **Get Forecasts**: See projected end-of-month spending based on current patterns
+2. **Get Forecasts**: See projected end-of-month spending for the current month
 3. **Receive Advice**: Get personalized savings tips when approaching budget limits
-4. **Reset Monthly**: Use the "Reset Budgets" button to start fresh each month
-5. **Edit Categories**: Adjust budget limits anytime by clicking the edit icon
+4. **Edit Categories**: Adjust budget limits anytime by clicking the edit icon
 
 ### Understanding Your Dashboard
 - **Financial Health Score**: Overall assessment (0-100) of your financial well-being
 - **Monthly Trends**: See how your spending changes over time
 - **Top Categories**: Your biggest expense categories
 - **Money Leaks**: Potential areas for cost savings
-- **Budget Overview**: Circular progress indicator showing overall budget health
 
 ### Using the AI Coach 🤖
 1. Go to **AI Coach** page
-2. Select a time period to analyze (Current Month, Last Month, etc.)
+2. Select a time period to analyze
 3. Review personalized insights and recommendations
 4. Get actionable advice for specific spending categories
 5. Follow suggested actions to improve your financial health
@@ -196,7 +191,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Budget templates and scenarios
 - [ ] Investment tracking
 - [ ] Debt management tools
-- [ ] Financial goal planning
+- [ ] Savings goal tracking
 - [ ] Multi-currency support
 - [ ] Advanced reporting and analytics
 
